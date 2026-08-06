@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Certificados · Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#161c2e;
+    --navy:#1c2a4a;
+    --navy-deep:#101830;
+    --brass:#a9812f;
+    --brass-bright:#c99a3d;
+    --parchment:#faf5e9;
+    --parchment-dark:#f0e6cf;
+    --paper:#fbfaf7;
+    --line:#dcd3bd;
+    --ok:#2f6f4f;
+    --ok-bg:#e9f3ec;
+    --bad:#a13c3c;
+    --bad-bg:#f7e9e9;
+    --muted:#6b7280;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:40px 20px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    font-weight:500;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:34px;
+    margin:2px 0 0;
+    color:var(--navy-deep);
+  }
+  .sub{
+    color:var(--muted);
+    font-size:14.5px;
+    max-width:560px;
+    margin-top:6px;
+    line-height:1.5;
+  }
+  .demo-note{
+    font-size:12.5px;
+    color:var(--muted);
+    background:var(--parchment);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 12px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1.15fr;
+    gap:28px;
+    margin-top:32px;
+    align-items:start;
+  }
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--navy-deep);
+  }
+  .panel .hint{font-size:12.5px;color:var(--muted);margin-bottom:20px;}
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:var(--navy);
+    margin:14px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  input,select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #cfd6e4;
+    border-radius:9px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus,select:focus{outline:2px solid var(--brass-bright);outline-offset:1px;border-color:var(--brass-bright);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    border:none;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .btn-primary{
+    margin-top:22px;
+    width:100%;
+    padding:13px;
+    background:var(--navy-deep);
+    color:#fff;
+    letter-spacing:.01em;
+  }
+  .btn-primary:hover{background:var(--navy);}
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--navy);
+    padding:6px 12px;
+    font-size:12.5px;
+  }
+  .btn-ghost:hover{background:var(--parchment);}
+  .btn-danger{color:var(--bad);border-color:#e3c6c6;}
+  .btn-danger:hover{background:var(--bad-bg);}
+
+  /* Certificate */
+  .cert-shell{
+    background:var(--parchment);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px;
+  }
+  .cert-shell h2{margin-bottom:16px;}
+  .cert{
+    position:relative;
+    background:var(--parchment);
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(169,129,47,0.06), transparent 60%);
+    border:2px solid var(--brass);
+    outline:1px solid var(--brass);
+    outline-offset:5px;
+    border-radius:4px;
+    padding:38px 34px 30px;
+    text-align:center;
+  }
+  .cert-empty{
+    padding:70px 20px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+  .cert-empty svg{opacity:.35;margin-bottom:10px;}
+  .cert .mark{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.18em;
+    color:var(--brass);
+    text-transform:uppercase;
+  }
+  .cert h3{
+    font-family:'Fraunces',serif;
+    font-size:15px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--navy);
+    margin:10px 0 2px;
+    font-weight:600;
+  }
+  .cert .institute{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    color:var(--navy-deep);
+    margin:2px 0 18px;
+    font-weight:700;
+  }
+  .cert .grants{font-size:12.5px;color:var(--muted);}
+  .cert .studentname{
+    font-family:'Fraunces',serif;
+    font-size:28px;
+    color:var(--navy-deep);
+    margin:8px 0 14px;
+    font-style:italic;
+  }
+  .cert .desc{font-size:13.5px;color:var(--ink);line-height:1.7;max-width:420px;margin:0 auto;}
+  .cert .desc b{color:var(--navy-deep);}
+  .cert-foot{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    margin-top:26px;
+    padding-top:16px;
+    border-top:1px solid var(--brass);
+    text-align:left;
+  }
+  .cert-foot .meta{font-size:11px;color:var(--muted);line-height:1.6;}
+  .cert-foot .meta b{color:var(--navy);}
+  .cert-foot .code{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--brass);}
+  #qrbox{background:#fff;padding:6px;border-radius:6px;border:1px solid var(--line);}
+
+  .cert-actions{display:flex;gap:10px;margin-top:18px;justify-content:center;}
+
+  /* list */
+  .list-title{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    font-weight:600;
+    color:var(--navy-deep);
+    margin:38px 0 12px;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--muted);
+    padding:8px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  td{padding:10px 10px;border-bottom:1px solid #ece5d3;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:3px 9px;
+    border-radius:20px;
+    font-weight:500;
+  }
+  .badge.vigente{background:var(--ok-bg);color:var(--ok);}
+  .badge.anulado{background:var(--bad-bg);color:var(--bad);}
+  .code-mini{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--navy);}
+  .empty-row{color:var(--muted);font-size:13px;padding:18px 10px;}
+
+  /* verifier */
+  .verify-panel{
+    margin-top:36px;
+    background:var(--navy-deep);
+    border-radius:var(--radius);
+    padding:30px;
+    color:#fff;
+  }
+  .verify-panel .eyebrow{color:var(--brass-bright);}
+  .verify-panel h2{color:#fff;font-family:'Fraunces',serif;font-size:20px;margin:4px 0 4px;}
+  .verify-panel .hint{color:#aab3c7;font-size:13px;margin-bottom:18px;}
+  .verify-row{display:flex;gap:10px;}
+  .verify-row input{
+    flex:1;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    color:#fff;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+  .verify-row input::placeholder{color:#8891a5;}
+  .verify-row button{
+    background:var(--brass-bright);
+    color:var(--navy-deep);
+    padding:0 20px;
+  }
+  .verify-row button:hover{background:#dcae52;}
+
+  .result{
+    margin-top:20px;
+    border-radius:10px;
+    padding:18px 20px;
+    display:none;
+  }
+  .result.ok{background:rgba(47,111,79,0.18);border:1px solid rgba(120,200,150,0.35);}
+  .result.bad{background:rgba(161,60,60,0.2);border:1px solid rgba(220,120,120,0.35);}
+  .result.show{display:block;}
+  .result .rtitle{font-weight:700;font-size:14.5px;margin-bottom:8px;}
+  .result.ok .rtitle{color:#8fe0ab;}
+  .result.bad .rtitle{color:#f0a5a5;}
+  .result dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px;margin:0;}
+  .result dt{color:#9aa4bb;}
+  .result dd{margin:0;color:#fff;}
+
+  .footer-note{
+    margin-top:30px;
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+  }
+
+  /* reCAPTCHA */
+  .recaptcha-badge{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:16px;
+    padding:9px 12px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:8px;
+    font-size:11.5px;
+    color:#9aa4bb;
+  }
+  .recaptcha-badge svg{flex-shrink:0;}
+  .recaptcha-badge b{color:#cdd4e3;}
+  .recaptcha-badge a{color:var(--brass-bright);text-decoration:none;}
+  .recaptcha-badge a:hover{text-decoration:underline;}
+
+  .attempts-meter{
+    margin-top:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:#8891a5;
+  }
+  .attempts-meter b{color:#cdd4e3;}
+
+  .result.blocked{background:rgba(199,140,40,0.18);border:1px solid rgba(220,170,90,0.4);}
+  .result.blocked .rtitle{color:#e8bb6b;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="eyebrow">Demo funcional · datos solo en memoria</div>
+      <h1>Emisión y verificación de certificados</h1>
+      <div class="sub">Registra un certificado con datos académicos, genera el documento con código QR, y valida su autenticidad escaneando o pegando el código.</div>
+    </div>
+    <div class="demo-note">Se reinicia al recargar la página</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- FORM -->
+    <div class="panel">
+      <h2>Registrar certificado</h2>
+      <div class="hint">Datos académicos del alumno</div>
+
+      <label for="f-nombre">Nombre completo</label>
+      <input id="f-nombre" placeholder="Ej. María Fernanda Torres Quispe" value="María Fernanda Torres Quispe">
+
+      <div class="row2">
+        <div>
+          <label for="f-doc">DNI / Carnet</label>
+          <input id="f-doc" placeholder="72918456" value="72918456">
+        </div>
+        <div>
+          <label for="f-nivel">Nivel</label>
+          <input id="f-nivel" placeholder="Advanced 2" value="Advanced 2">
+        </div>
+      </div>
+
+      <label for="f-curso">Curso / Certificación</label>
+      <input id="f-curso" placeholder="Inglés Comunicativo" value="Inglés Comunicativo">
+
+      <div class="row2">
+        <div>
+          <label for="f-nota">Nota final</label>
+          <input id="f-nota" placeholder="18" value="18">
+        </div>
+        <div>
+          <label for="f-fecha">Fecha de emisión</label>
+          <input id="f-fecha" type="date">
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-emitir">Emitir certificado</button>
+
+      <div class="list-title">Certificados emitidos</div>
+      <table>
+        <thead><tr><th>Código</th><th>Alumno</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tbl-body">
+          <tr><td colspan="4" class="empty-row">Aún no se ha emitido ningún certificado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CERTIFICATE -->
+    <div class="cert-shell">
+      <h2>Documento generado</h2>
+      <div id="cert-area">
+        <div class="cert-empty">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#a9812f" stroke-width="1.4"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          <div>Completa el formulario y presiona<br><b>“Emitir certificado”</b> para ver el documento.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERIFIER -->
+  <div class="verify-panel">
+    <div class="eyebrow">Verificador público</div>
+    <h2>¿Escaneaste un código QR?</h2>
+    <div class="hint">Pega el código del certificado para validar su autenticidad — esto simula lo que vería alguien al escanear el QR.</div>
+    <div class="verify-row">
+      <input id="verify-input" placeholder="Ej. 8f3a1c2e-91b4-4d7a-…">
+      <button id="btn-verify">Validar</button>
+    </div>
+    <div class="attempts-meter" id="attempts-meter">Intentos en el último minuto: <b>0</b> / 5</div>
+    <div class="recaptcha-badge">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z" stroke="#c99a3d" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#c99a3d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Protegido por <b>reCAPTCHA v3 Enterprise</b> · evalúa cada consulta antes de responder — <a href="#" onclick="return false;">cómo funciona</a></span>
+    </div>
+    <div class="result" id="verify-result"></div>
+  </div>
+
+  <div class="footer-note">Demo en memoria del navegador · en producción: Node.js + Express + base de datos, firma HMAC del contenido y verificación server-side.</div>
+</div>
+
+<script>
+const db = []; // { codigo, nombre, doc, curso, nivel, nota, fecha, estado, hash }
+const qrInstances = {};
+
+document.getElementById('f-fecha').valueAsDate = new Date();
+
+function uuid(){
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
+    const r = Math.random()*16|0;
+    const v = c==='x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
+async function signHash(payload){
+  const enc = new TextEncoder().encode(payload + '::CLAVE-SECRETA-DEMO');
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,16);
+}
+
+function fmtDate(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${d} ${meses[+m-1]} ${y}`;
+}
+
+function renderTable(){
+  const body = document.getElementById('tbl-body');
+  if(db.length === 0){
+    body.innerHTML = '<tr><td colspan="4" class="empty-row">Aún no se ha emitido ningún certificado.</td></tr>';
+    return;
+  }
+  body.innerHTML = db.slice().reverse().map(c => `
+    <tr>
+      <td class="code-mini">${c.codigo.slice(0,8)}…</td>
+      <td>${c.nombre}</td>
+      <td><span class="badge ${c.estado}">${c.estado}</span></td>
+      <td>
+        ${c.estado === 'vigente'
+          ? `<button class="btn-ghost btn-danger" onclick="revocar('${c.codigo}')">Revocar</button>`
+          : `<button class="btn-ghost" onclick="reactivar('${c.codigo}')">Reactivar</button>`}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function revocar(codigo){
+  const c = db.find(x=>x.codigo===codigo);
+  if(c) c.estado = 'anulado';
+  renderTable();
+}
+function reactivar(codigo){
+  const c = db.find(x=>x.codigo===codigo);
+  if(c) c.estado = 'vigente';
+  renderTable();
+}
+
+function renderCertificate(c){
+  const area = document.getElementById('cert-area');
+  area.innerHTML = `
+    <div class="cert">
+      <div class="mark">Certifica que</div>
+      <div class="institute">ICPNA</div>
+      <div class="grants">otorga el presente certificado a</div>
+      <div class="studentname">${c.nombre}</div>
+      <div class="desc">
+        por haber completado satisfactoriamente el curso<br>
+        <b>${c.curso}</b> — nivel <b>${c.nivel}</b><br>
+        con nota final de <b>${c.nota}</b>
+      </div>
+      <div class="cert-foot">
+        <div class="meta">
+          <div><b>Documento:</b> ${c.doc}</div>
+          <div><b>Emitido:</b> ${fmtDate(c.fecha)}</div>
+          <div class="code">${c.codigo}</div>
+        </div>
+        <div id="qrbox"></div>
+      </div>
+    </div>
+    <div class="cert-actions">
+      <button class="btn-ghost" onclick="prefillVerify('${c.codigo}')">Simular escaneo del QR ↓</button>
+    </div>
+  `;
+  new QRCode(document.getElementById('qrbox'), {
+    text: `https://certificados.icpna.edu.pe/verificar/${c.codigo}`,
+    width: 84, height: 84,
+    colorDark: '#101830', colorLight: '#ffffff'
+  });
+}
+
+function prefillVerify(codigo){
+  document.getElementById('verify-input').value = codigo;
+  document.getElementById('verify-input').scrollIntoView({behavior:'smooth', block:'center'});
+  document.querySelector('.verify-panel').style.outline = '2px solid #c99a3d';
+  setTimeout(()=> document.querySelector('.verify-panel').style.outline = 'none', 900);
+}
+
+document.getElementById('btn-emitir').addEventListener('click', async ()=>{
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const doc = document.getElementById('f-doc').value.trim();
+  const curso = document.getElementById('f-curso').value.trim();
+  const nivel = document.getElementById('f-nivel').value.trim();
+  const nota = document.getElementById('f-nota').value.trim();
+  const fecha = document.getElementById('f-fecha').value;
+
+  if(!nombre || !curso || !fecha){
+    alert('Completa al menos nombre, curso y fecha.');
+    return;
+  }
+
+  const codigo = uuid();
+  const hash = await signHash(`${codigo}|${nombre}|${doc}|${curso}|${nivel}|${nota}|${fecha}`);
+  const cert = { codigo, nombre, doc, curso, nivel, nota, fecha, estado:'vigente', hash };
+  db.push(cert);
+  renderTable();
+  renderCertificate(cert);
+});
+
+const RATE_LIMIT = 5;       // intentos máximos
+const RATE_WINDOW_MS = 60000; // por minuto
+const LOCKOUT_MS = 20000;    // bloqueo simulado
+let attemptLog = [];
+let blockedUntil = 0;
+
+function updateAttemptsMeter(){
+  const now = Date.now();
+  attemptLog = attemptLog.filter(t => now - t < RATE_WINDOW_MS);
+  document.getElementById('attempts-meter').innerHTML =
+    `Intentos en el último minuto: <b>${attemptLog.length}</b> / ${RATE_LIMIT}`;
+}
+
+// Simula lo que reCAPTCHA v3 entregaría: un score 0–1.
+// Aquí lo derivamos de la frecuencia de intentos, para que se sienta real:
+// muchos intentos seguidos = score bajo (probable bot).
+function simulateRecaptchaScore(){
+  const now = Date.now();
+  const recent = attemptLog.filter(t => now - t < 8000).length; // últimos 8s
+  if(recent >= 3) return 0.1;
+  if(recent === 2) return 0.4;
+  return 0.9;
+}
+
+document.getElementById('btn-verify').addEventListener('click', ()=>{
+  const box = document.getElementById('verify-result');
+  const now = Date.now();
+
+  if(now < blockedUntil){
+    const secs = Math.ceil((blockedUntil - now)/1000);
+    box.className = 'result blocked show';
+    box.innerHTML = `<div class="rtitle">⏳ Demasiados intentos</div>
+      <div style="font-size:13px;color:#e8bb6b;">reCAPTCHA detectó actividad sospechosa (score bajo). Espera ${secs}s antes de volver a intentar.</div>`;
+    return;
+  }
+
+  attemptLog.push(now);
+  updateAttemptsMeter();
+
+  const score = simulateRecaptchaScore();
+
+  if(attemptLog.filter(t => now - t < RATE_WINDOW_MS).length > RATE_LIMIT || score < 0.3){
+    blockedUntil = now + LOCKOUT_MS;
+    box.className = 'result blocked show';
+    box.innerHTML = `<div class="rtitle">⏳ Verificación bloqueada</div>
+      <div style="font-size:13px;color:#e8bb6b;">reCAPTCHA v3 asignó un score de <b>${score.toFixed(2)}</b> (umbral mínimo: 0.30) — patrón compatible con scraping automatizado. Bloqueado ${LOCKOUT_MS/1000}s.</div>`;
+    return;
+  }
+
+  const input = document.getElementById('verify-input').value.trim();
+  const c = db.find(x=>x.codigo === input);
+
+  if(!c){
+    box.className = 'result bad show';
+    box.innerHTML = `<div class="rtitle">✕ Código no encontrado</div><div style="font-size:13px;color:#dbb;">Este código no corresponde a ningún certificado emitido por el sistema.</div>`;
+    return;
+  }
+  if(c.estado === 'anulado'){
+    box.className = 'result bad show';
+    box.innerHTML = `<div class="rtitle">✕ Certificado anulado</div>
+      <dl><dt>Alumno</dt><dd>${c.nombre}</dd><dt>Curso</dt><dd>${c.curso}</dd></dl>`;
+    return;
+  }
+  box.className = 'result ok show';
+  box.innerHTML = `<div class="rtitle">✓ Certificado válido <span style="font-weight:400;color:#8fe0ab;font-size:11.5px;">· score reCAPTCHA ${score.toFixed(2)}</span></div>
+    <dl>
+      <dt>Alumno</dt><dd>${c.nombre}</dd>
+      <dt>Documento</dt><dd>${c.doc}</dd>
+      <dt>Curso</dt><dd>${c.curso} — ${c.nivel}</dd>
+      <dt>Nota</dt><dd>${c.nota}</dd>
+      <dt>Emitido</dt><dd>${fmtDate(c.fecha)}</dd>
+    </dl>`;
+});
+
+document.getElementById('verify-input').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') document.getElementById('btn-verify').click();
+});
+
+setInterval(updateAttemptsMeter, 2000);
+</script>
+</body>
+</html>
