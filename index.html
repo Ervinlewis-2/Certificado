@@ -1,418 +1,830 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Académico · Corporación del Perú</title>
-    <!-- Bootstrap 5 para el layout base -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Fuentes del nuevo tema -->
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <style>
-        /* ================= TEMA INSTITUCIONAL ================= */
-        :root {
-            --navy: #1B2A4A; 
-            --navy-deep: #101A2E; 
-            --navy-soft: #2C3F63;
-            --paper: #F6F5F0; 
-            --paper-line: #E3DFD2;
-            --gold: #A9822F; 
-            --gold-soft: #C9A84C;
-            --stamp: #A23B2E;
-            --ink: #20242C; 
-            --muted: #6B7280;
-            --success: #3F6B4F; 
-            --success-bg: #EAF2EC;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporación del Perú · Sistema de Certificados y Gestión Académica</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --navy:#1B2A4A; --navy-deep:#101A2E; --navy-soft:#2C3F63;
+    --paper:#F6F5F0; --paper-line:#E3DFD2;
+    --gold:#A9822F; --gold-soft:#C9A84C;
+    --stamp:#A23B2E;
+    --ink:#20242C; --muted:#6B7280;
+    --success:#3F6B4F; --success-bg:#EAF2EC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--navy-deep);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  button{font-family:inherit;}
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--paper); 
-            color: var(--ink); 
-            min-height: 100vh; 
-            -webkit-font-smoothing: antialiased; 
-        }
+  /* ---------- FAKE BROWSER CHROME ---------- */
+  .chrome{
+    background:#EDEBE2;border-bottom:1px solid #D9D5C6;
+    padding:9px 16px;display:flex;align-items:center;gap:10px;
+  }
+  .chrome .dots{display:flex;gap:5px;}
+  .chrome .dots span{width:9px;height:9px;border-radius:50%;background:#D3CFC0;}
+  .chrome .url{
+    flex:1;background:#fff;border:1px solid #D9D5C6;border-radius:99px;
+    padding:5px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);
+    display:flex;align-items:center;gap:6px;max-width:520px;margin:0 auto;
+  }
+  .chrome .lock{color:var(--success);}
 
-        h1, h2, h3, h4, .font-serif { font-family: 'Fraunces', serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
+  /* ---------- LOGIN PAGE ---------- */
+  .login-page{
+    min-height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 30% 20%, #24365C, var(--navy-deep) 65%);
+    padding:40px 20px;
+  }
+  .login-card{
+    background:#fff;border-radius:14px;padding:44px 40px;width:100%;max-width:380px;
+    box-shadow:0 30px 60px -24px rgba(0,0,0,.5);
+  }
+  .login-mark{width:52px;height:52px;margin:0 auto 18px;position:relative;}
+  .login-mark span{position:absolute;border:2.5px solid var(--gold);border-radius:50%;}
+  .login-mark span:nth-child(1){width:52px;height:52px;}
+  .login-mark span:nth-child(2){width:34px;height:34px;top:9px;left:9px;border-color:var(--navy);}
+  .login-card h2{font-family:'Fraunces',serif;text-align:center;font-size:20px;margin:0 0 2px;color:var(--navy);}
+  .login-card .sub{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 28px;}
+  .login-card .field{margin-bottom:14px;}
+  .login-card label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:5px;}
+  .login-card input{width:100%;padding:11px 12px;border:1px solid #D8D4C6;border-radius:8px;font-size:14px;background:#FBFAF7;}
+  .login-card input:focus{outline:2px solid var(--gold-soft);outline-offset:1px;border-color:var(--gold);}
+  .login-card .btn-login{
+    width:100%;margin-top:6px;background:var(--navy);color:#fff;border:none;border-radius:8px;
+    padding:12px;font-weight:600;font-size:14px;cursor:pointer;
+  }
+  .login-card .btn-login:hover{background:var(--navy-soft);}
+  .login-hint{
+    margin-top:20px;background:#F1EFE6;border:1px solid var(--paper-line);border-radius:8px;
+    padding:10px 12px;font-size:11.5px;color:var(--navy);text-align:center;font-family:'JetBrains Mono',monospace;
+  }
+  .login-error{color:var(--stamp);font-size:12px;margin:-6px 0 14px;display:none;}
+  .login-public{text-align:center;margin-top:22px;font-size:12.5px;}
+  .login-public a{color:var(--gold);font-weight:600;text-decoration:none;cursor:pointer;}
 
-        /* ---------- Navegación Superior ---------- */
-        .navbar { background: var(--navy-deep) !important; padding: 15px 0; border-bottom: 3px solid var(--gold); }
-        .navbar-brand { color: #fff !important; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px;}
-        .navbar-brand span { color: var(--gold-soft); }
-        .nav-link { color: #B7C0D4 !important; font-weight: 500; font-size: 14px; padding: 10px 15px; border-radius: 8px; margin-left: 5px;}
-        .nav-link:hover { background: rgba(255,255,255,.06); color: #fff !important; }
-        .nav-link.active { background: rgba(201,168,76,.16); color: #fff !important; }
+  /* ---------- APP SHELL ---------- */
+  .shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 40px);}
+  @media (max-width:820px){.shell{grid-template-columns:1fr;}}
+  .sidebar{background:linear-gradient(180deg,var(--navy-deep),var(--navy) 75%);color:#EDEFF5;padding:26px 20px;display:flex;flex-direction:column;gap:24px;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .brand-mark{width:34px;height:34px;flex:none;position:relative;}
+  .brand-mark span{position:absolute;border:2px solid var(--gold-soft);border-radius:50%;}
+  .brand-mark span:nth-child(1){width:34px;height:34px;}
+  .brand-mark span:nth-child(2){width:22px;height:22px;top:6px;left:6px;border-color:#EDEFF5;opacity:.6;}
+  .brand-text .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin:0 0 2px;}
+  .brand-text h1{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin:0;line-height:1.15;}
+  .who{font-size:12px;color:#B7C0D4;background:rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;line-height:1.5;}
+  .who b{color:#fff;display:block;font-size:13px;}
+  nav{display:flex;flex-direction:column;gap:4px;}
+  .nav-btn{display:flex;align-items:center;gap:10px;background:transparent;border:none;color:#C6CCDA;font-size:13.5px;font-weight:500;padding:11px 12px;border-radius:8px;cursor:pointer;text-align:left;}
+  .nav-btn:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .nav-btn.active{background:rgba(201,168,76,.16);color:#fff;}
+  .logout-btn{margin-top:auto;background:transparent;border:1px solid rgba(255,255,255,.15);color:#C6CCDA;padding:9px 12px;border-radius:8px;font-size:12.5px;cursor:pointer;}
+  .logout-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
 
-        /* ---------- Tarjetas y Formularios ---------- */
-        .card { background: #fff; border: 1px solid var(--paper-line); border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); }
-        label { display: block; font-size: 12.5px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px 12px; border: 1px solid #D8D4C6; border-radius: 7px; font-size: 14px; color: var(--ink); background: #FBFAF7; }
-        input:focus, select:focus { outline: 2px solid var(--gold-soft); outline-offset: 1px; border-color: var(--gold); }
-        
-        /* ---------- Botones ---------- */
-        .btn-custom { font-weight: 600; font-size: 13.5px; padding: 12px 20px; border-radius: 7px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Inter', sans-serif;}
-        .btn-primary-custom { background: var(--navy); color: #fff; }
-        .btn-primary-custom:hover { background: var(--navy-soft); color: #fff;}
-        .btn-gold-custom { background: var(--gold); color: #fff; }
-        .btn-gold-custom:hover { background: #96721F; color:#fff;}
-        .btn-ghost-custom { background: transparent; color: var(--navy); border: 1px solid var(--paper-line); }
-        .btn-ghost-custom:hover { background: #F1EFE6; color: var(--navy);}
+  main{background:var(--paper);padding:38px 46px 80px;}
+  @media (max-width:640px){main{padding:22px 18px 60px;}}
+  .page{display:none;max-width:920px;margin:0 auto;}
+  .page.active{display:block;animation:rise .3s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .page-head{margin-bottom:26px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+  .page-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
+  .page-head h2{font-family:'Fraunces',serif;font-size:27px;font-weight:600;margin:0 0 6px;color:var(--navy);}
+  .page-head p{margin:0;color:var(--muted);font-size:14px;max-width:56ch;line-height:1.5;}
 
-        /* ---------- Diseño Boleta (Ticket Térmico) ---------- */
-        .boleta-wrap { display: flex; justify-content: center; padding: 20px 0; }
-        .ticket {
-            width: 340px; background: #fff; border: 1px solid var(--paper-line);
-            padding: 25px 20px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink);
-            box-shadow: 0 18px 40px -20px rgba(16,26,46,.3);
-            background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(0,0,0,.015) 27px, rgba(0,0,0,.015) 28px);
-        }
-        .ticket .t-center { text-align: center; }
-        .ticket .t-org { font-weight: 700; font-size: 14px; letter-spacing: .03em; }
-        .ticket .t-sub { color: var(--muted); font-size: 10px; line-height: 1.5; }
-        .ticket hr { border: none; border-top: 1px dashed #C7C2B1; margin: 12px 0; }
-        .ticket .t-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; line-height: 1.55; }
-        .ticket .t-row span:first-child { color: var(--muted); }
-        .ticket .t-row span:last-child { text-align: right; }
-        .ticket .t-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; color: var(--navy); margin-top: 10px; border-top: 1px dashed #C7C2B1; padding-top: 10px;}
-        .ticket .t-foot { text-align: center; font-size: 9.5px; color: var(--muted); margin-top: 20px; line-height: 1.6; }
+  .card{background:#fff;border:1px solid var(--paper-line);border-radius:12px;padding:24px 26px;margin-bottom:18px;}
+  .card h3{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin:0 0 16px;color:var(--navy);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr;}}
+  label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:5px;}
+  input,select,textarea{width:100%;padding:9px 11px;border:1px solid #D8D4C6;border-radius:7px;font-size:13.5px;color:var(--ink);background:#FBFAF7;}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--gold-soft);outline-offset:1px;border-color:var(--gold);}
+  .field{margin-bottom:14px;}
+  .btn{font-weight:600;font-size:13.5px;padding:10px 18px;border-radius:7px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-soft);}
+  .btn-gold{background:var(--gold);color:#fff;}
+  .btn-gold:hover{background:#96721F;}
+  .btn-ghost{background:transparent;color:var(--navy);border:1px solid var(--paper-line);}
+  .btn-ghost:hover{background:#F1EFE6;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
 
-        /* ---------- Diseño Certificado ---------- */
-        .cert-wrap { 
-            background: #fff; border: 1px solid var(--paper-line); border-radius: 4px; 
-            padding: 50px 60px 40px; position: relative; overflow: hidden; 
-            box-shadow: 0 22px 46px -22px rgba(16,26,46,.35); 
-            max-width: 900px; margin: 0 auto;
-        }
-        .cert-wrap::before { content: ""; position: absolute; inset: 12px; border: 1.5px solid var(--gold-soft); border-radius: 2px; pointer-events: none; }
-        .cert-wrap::after { content: ""; position: absolute; inset: 18px; border: 1px solid #E9E2CC; border-radius: 2px; pointer-events: none; }
-        
-        .cert-top { text-align: center; margin-bottom: 15px; }
-        .cert-mark { width: 55px; height: 55px; margin: 0 auto 12px; position: relative; }
-        .cert-mark span { position: absolute; border: 2px solid var(--gold); border-radius: 50%; }
-        .cert-mark span:nth-child(1) { width: 55px; height: 55px; }
-        .cert-mark span:nth-child(2) { width: 37px; height: 37px; top: 9px; left: 9px; border-color: var(--navy); }
-        
-        .cert-org { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-        .cert-title { font-family: 'Fraunces', serif; font-size: 16px; letter-spacing: .2em; text-transform: uppercase; color: var(--stamp); margin: 15px 0 5px; font-weight: 600; }
-        .cert-lead { font-size: 14px; color: var(--muted); margin: 0; }
-        .cert-name { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; text-align: center; color: var(--navy); margin: 20px 0 10px; border-bottom: 1px solid var(--paper-line); padding-bottom: 15px; text-transform: uppercase;}
-        .cert-body { font-size: 14px; line-height: 1.7; text-align: center; color: var(--ink); max-width: 65ch; margin: 0 auto 25px; }
-        
-        .cert-grades { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 0 auto 25px; max-width: 80%;}
-        .cert-grades th { font-size: 11.5px; font-weight: 500; text-align: left; color: var(--muted); border-bottom: 1px solid var(--paper-line); padding: 8px 6px; }
-        .cert-grades td { padding: 8px 6px; border-bottom: 1px solid #F3F1E9; color: var(--navy); font-weight: 500;}
-        .cert-grades td:last-child, .cert-grades th:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600;}
-        .cert-grades tr.avg td { font-weight: 700; color: var(--navy); border-top: 1.5px solid var(--navy); border-bottom: none; padding-top: 10px; font-size: 14px;}
-        
-        .cert-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 35px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); line-height: 1.6;}
-        
-        /* ---------- Reglas de Impresión ---------- */
-        @media print {
-            body { background: #fff !important; }
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: none; padding: 0; margin: 0; }
-            #view-inscripcion, #view-boleta, #view-certificado { display: none; }
-            .d-block-print { display: block !important; }
-            
-            /* Ajustes Ticket Impresión */
-            .ticket { position: absolute; top: 0; left: 50%; transform: translateX(-50%); box-shadow: none; border: 1px solid #000; background-image: none; }
-            /* Ajustes Certificado Impresión */
-            .cert-wrap { border: none; box-shadow: none; padding: 40px; width: 100%; max-width: none;}
-        }
-    </style>
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--paper-line);}
+  td{padding:10px 10px;border-bottom:1px solid #F0EEE5;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr.link-row{cursor:pointer;}
+  tr.link-row:hover{background:#FAF9F4;}
+  .pill{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 9px;border-radius:99px;display:inline-block;font-weight:600;}
+  .pill-pend{background:#FCEFE4;color:#9A5B1E;}
+  .pill-ok{background:var(--success-bg);color:var(--success);}
+  .pill-cert{background:#E9EDF6;color:var(--navy);}
+  .empty-row td{color:var(--muted);font-style:italic;text-align:center;padding:22px;}
+  .notice{display:flex;gap:10px;align-items:flex-start;background:#F1EFE6;border:1px solid var(--paper-line);border-radius:9px;padding:12px 14px;font-size:12.5px;color:var(--navy);margin-bottom:18px;}
+  .back-link{background:none;border:none;color:var(--navy);font-weight:600;font-size:12.5px;cursor:pointer;padding:0;margin-bottom:14px;display:inline-flex;align-items:center;gap:6px;}
+  .back-link:hover{text-decoration:underline;}
+
+  /* ---------- CERTIFICADO ---------- */
+  .cert-wrap{background:#fff;border:1px solid var(--paper-line);border-radius:4px;padding:40px 40px 32px;position:relative;overflow:hidden;box-shadow:0 22px 46px -22px rgba(16,26,46,.35);}
+  .cert-wrap::before{content:"";position:absolute;inset:10px;border:1.5px solid var(--gold-soft);border-radius:2px;pointer-events:none;}
+  .cert-wrap::after{content:"";position:absolute;inset:16px;border:1px solid #E9E2CC;border-radius:2px;pointer-events:none;}
+  .cert-top{text-align:center;margin-bottom:6px;}
+  .cert-mark{width:48px;height:48px;margin:0 auto 10px;position:relative;}
+  .cert-mark span{position:absolute;border:2px solid var(--gold);border-radius:50%;}
+  .cert-mark span:nth-child(1){width:48px;height:48px;}
+  .cert-mark span:nth-child(2){width:31px;height:31px;top:8px;left:8px;border-color:var(--navy);}
+  .cert-org{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .cert-title{font-family:'Fraunces',serif;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--stamp);margin:13px 0 4px;font-weight:600;}
+  .cert-lead{font-size:12.5px;color:var(--muted);margin:0;}
+  .cert-name{font-family:'Fraunces',serif;font-size:26px;font-weight:600;text-align:center;color:var(--navy);margin:14px 0 6px;border-bottom:1px solid var(--paper-line);padding-bottom:10px;text-transform:uppercase;}
+  .cert-body{font-size:12.5px;line-height:1.6;text-align:center;color:var(--ink);max-width:60ch;margin:0 auto 18px;}
+  .cert-body b{color:var(--navy);}
+  .cert-grades{width:100%;border-collapse:collapse;font-size:11px;margin:0 0 16px;}
+  .cert-grades th{font-size:10px;font-weight:500;text-align:left;color:var(--muted);border-bottom:1px solid var(--paper-line);padding:5px 4px;}
+  .cert-grades td{padding:5px 4px;border-bottom:1px solid #F3F1E9;}
+  .cert-grades td:last-child,.cert-grades th:last-child{text-align:right;font-family:'JetBrains Mono',monospace;}
+  .cert-grades tr.avg td{font-weight:700;color:var(--navy);border-top:1.5px solid var(--navy);border-bottom:none;padding-top:8px;}
+  .cert-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:20px;}
+  .cert-sign{text-align:center;font-size:10.5px;color:var(--muted);}
+  .cert-sign .line{width:130px;border-top:1px solid var(--ink);margin:0 auto 4px;}
+  .cert-qr{text-align:center;}
+  .cert-qr .code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
+
+  /* ---------- VERIFY PUBLIC ---------- */
+  .public-page{min-height:calc(100vh - 40px);background:var(--paper);}
+  .public-header{background:var(--navy);color:#fff;padding:20px 40px;display:flex;align-items:center;gap:12px;}
+  .public-header .brand-mark span{border-color:var(--gold-soft);}
+  .public-header .brand-mark span:nth-child(2){border-color:#fff;opacity:.6;}
+  .public-header h1{font-family:'Fraunces',serif;font-size:15px;margin:0;font-weight:600;}
+  .public-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin:0 0 2px;}
+  .public-body{max-width:520px;margin:0 auto;padding:48px 20px;}
+  .verify-search{display:flex;gap:10px;}
+  .verify-search input{font-family:'JetBrains Mono',monospace;letter-spacing:.03em;}
+  .verify-result{margin-top:20px;border-radius:10px;padding:20px;display:none;}
+  .verify-result.show{display:block;animation:rise .3s ease both;}
+  .verify-result.ok{background:var(--success-bg);border:1px solid #CFE3D5;}
+  .verify-result.bad{background:#FBEAE7;border:1px solid #F0C7BE;}
+  .verify-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .verify-icon{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;}
+  .verify-result.ok .verify-icon{background:var(--success);}
+  .verify-result.bad .verify-icon{background:var(--stamp);}
+  .verify-result h4{margin:0;font-family:'Fraunces',serif;font-size:15px;}
+  .verify-result.ok h4{color:var(--success);}
+  .verify-result.bad h4{color:var(--stamp);}
+  .verify-detail div{font-size:13px;line-height:1.9;}
+  .verify-detail dt{color:var(--muted);display:inline-block;width:130px;}
+  .verify-detail dd{display:inline;margin:0;font-weight:600;color:var(--ink);}
+  .back-to-login{text-align:center;margin-top:26px;}
+  .back-to-login a{color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;}
+
+  /* ---------- BOLETA (TICKET) ---------- */
+  .boleta-wrap{display:flex;justify-content:center;padding:6px 0 20px;}
+  .ticket{
+    width:330px;background:#fff;border:1px solid var(--paper-line);
+    padding:22px 20px 18px;font-family:'JetBrains Mono',monospace;font-size:11.3px;color:var(--ink);
+    box-shadow:0 18px 40px -20px rgba(16,26,46,.3);
+    background-image:repeating-linear-gradient(180deg,transparent,transparent 27px,rgba(0,0,0,.015) 27px,rgba(0,0,0,.015) 28px);
+  }
+  .ticket .t-center{text-align:center;}
+  .ticket .t-org{font-weight:700;font-size:13px;letter-spacing:.03em;}
+  .ticket .t-sub{color:var(--muted);font-size:10px;line-height:1.5;}
+  .ticket hr{border:none;border-top:1px dashed #C7C2B1;margin:12px 0;}
+  .ticket .t-row{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;line-height:1.55;}
+  .ticket .t-row span:first-child{color:var(--muted);}
+  .ticket .t-row span:last-child{text-align:right;}
+  .ticket .t-detail{margin:10px 0;}
+  .ticket .t-detail .d-title{font-weight:600;margin-bottom:3px;}
+  .ticket .t-total{display:flex;justify-content:space-between;font-weight:700;font-size:13.5px;color:var(--navy);margin-top:8px;}
+  .ticket .t-son{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;}
+  .ticket .t-foot{text-align:center;font-size:9.5px;color:var(--muted);margin-top:16px;line-height:1.6;}
+
+  @media print{
+    body *{visibility:hidden;}
+    .ticket, .ticket *, .cert-wrap, .cert-wrap *{visibility:visible;}
+    .ticket, .cert-wrap{position:absolute;top:0;left:50%;transform:translateX(-50%);box-shadow:none;border:none;}
+  }
+</style>
 </head>
 <body>
 
-    <!-- Navegación Superior -->
-    <nav class="navbar navbar-expand-lg no-print mb-5 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="#">🎓 Corporación <span>del Perú</span></a>
-            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#" id="tab-inscripcion" onclick="switchView('inscripcion')">1. Inscripción</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="tab-boleta" onclick="switchView('boleta')">2. Boleta</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="tab-certificado" onclick="switchView('certificado')">3. Certificado</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<div class="chrome">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <div class="url"><span class="lock">🔒</span><span id="url-text">sistema.corporaciondelperu.com/login.php</span></div>
+</div>
 
-    <div class="container">
-
-        <!-- ==========================================
-             MÓDULO 1: INSCRIPCIONES
-             ========================================== -->
-        <div id="view-inscripcion" class="d-block">
-            
-            <div class="mb-4">
-                <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">inscripcion.php</p>
-                <h2 style="color: var(--navy); margin:0;">Nueva Inscripción</h2>
-                <p style="color: var(--muted); font-size: 14px;">Ingresa los datos del alumno. Se generará un correlativo automático al guardar.</p>
-            </div>
-
-            <div class="card">
-                <form id="formInscripcion" onsubmit="simularRegistro(event)">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label>DNI</label>
-                            <input type="text" id="insDni" placeholder="Ej. 21400211" required value="21400211" maxlength="8">
-                        </div>
-                        <div class="col-md-6">
-                            <label>Apellidos y Nombres</label>
-                            <input type="text" id="insNombres" required value="Ramos Donayre, Manuel Antonio">
-                        </div>
-                        <div class="col-md-6">
-                            <label>Celular</label>
-                            <input type="text" id="insCelular" value="956724100">
-                        </div>
-                        <div class="col-md-6">
-                            <label>Sede / Ubicación</label>
-                            <select id="insSede">
-                                <option>Huancayo</option>
-                                <option>Ica</option>
-                                <option selected>Marcona</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-12 mt-4 pt-3 border-top"></div>
-                        
-                        <div class="col-md-8">
-                            <label>Diplomado / Curso</label>
-                            <input type="text" id="insCurso" value="Diplomado: Formulación y evaluación de estudios de pre inversión en salud">
-                        </div>
-                        <div class="col-md-4">
-                            <label>Monto a Pagar (S/)</label>
-                            <input type="number" id="insMonto" value="270.00" required>
-                        </div>
-                    </div>
-                    
-                    <div class="text-end mt-4">
-                        <button type="submit" class="btn-custom btn-primary-custom w-100 w-md-auto">
-                            Guardar inscripción y emitir boleta
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-
-        <!-- ==========================================
-             MÓDULO 2: BOLETA DE PAGO (TICKET TÉRMICO)
-             ========================================== -->
-        <div id="view-boleta" class="d-none">
-            
-            <div class="d-flex justify-content-between align-items-end mb-4 no-print">
-                <div>
-                    <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">boleta.php</p>
-                    <h2 style="color: var(--navy); margin:0;">Boleta de Pago</h2>
-                </div>
-                <div>
-                    <button class="btn-custom btn-ghost-custom me-2" onclick="switchView('inscripcion')">← Nueva</button>
-                    <button class="btn-custom btn-gold-custom" onclick="imprimirSeccion()">🖨️ Imprimir Ticket</button>
-                </div>
-            </div>
-
-            <div class="boleta-wrap">
-                <div class="ticket">
-                    <div class="t-center">
-                        <div class="t-org">CORPORACIÓN DEL PERÚ</div>
-                        <div class="t-sub">RUC: 20100227461<br>Jr. Cuzco 310, Huancayo</div>
-                        <div style="margin-top:8px; font-weight:bold;">RECIBO ELECTRÓNICO</div>
-                        <div style="font-size:10.5px; color:var(--muted);">N° B001 - <span id="bolNumero">0008727</span></div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="t-row"><span>Fecha:</span><span id="bolFecha"></span></div>
-                    <div class="t-row"><span>Hora:</span><span id="bolHora"></span></div>
-                    <div class="t-row"><span>DNI:</span><span id="bolDni">21400211</span></div>
-                    <div class="t-row" style="flex-direction: column;">
-                        <span>Cliente:</span>
-                        <span id="bolNombres" style="text-align: left; color: var(--ink); font-weight: 600;">Ramos Donayre, Manuel Antonio</span>
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="t-row" style="flex-direction: column;">
-                        <span style="font-weight:600; color:var(--ink); margin-bottom: 3px;">DESCRIPCIÓN:</span>
-                        <span id="bolCurso" style="text-align: left;">Inscripción - Diplomado en Salud</span>
-                    </div>
-                    
-                    <div class="t-total">
-                        <span>TOTAL:</span>
-                        <span>S/ <span id="bolTotal">270.00</span></span>
-                    </div>
-                    
-                    <div class="t-foot">
-                        *** GRACIAS POR SU PREFERENCIA ***<br>
-                        Conserve este recibo para cualquier reclamo.<br>
-                        corporaciondelperu.com
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- ==========================================
-             MÓDULO 3: BÚSQUEDA Y CERTIFICADO
-             ========================================== -->
-        <div id="view-certificado" class="d-none">
-            
-            <!-- Buscador -->
-            <div id="certBuscador" class="card no-print">
-                <h3 style="color: var(--navy); margin-bottom: 20px;">Buscar Certificado para Impresión</h3>
-                <div class="row g-2">
-                    <div class="col-md-9">
-                        <input type="text" id="inputBuscarCert" placeholder="Ingrese DNI (Ej. 21400211)" style="padding: 12px 15px; font-size: 15px;">
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn-custom btn-primary-custom w-100 h-100" onclick="mostrarCertificado()">Buscar</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vista del Certificado -->
-            <div id="certPlantilla" class="d-none">
-                
-                <div class="d-flex justify-content-between align-items-end mb-4 no-print">
-                    <div>
-                        <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">certificado.php</p>
-                        <h2 style="color: var(--navy); margin:0;">Vista Previa del Diploma</h2>
-                    </div>
-                    <div>
-                        <button class="btn-custom btn-ghost-custom me-2" onclick="ocultarCertificado()">← Buscar otro</button>
-                        <button class="btn-custom btn-gold-custom" onclick="imprimirSeccion()">🖨️ Imprimir PDF</button>
-                    </div>
-                </div>
-
-                <div class="cert-wrap">
-                    <div class="cert-top">
-                        <div class="cert-mark"><span></span><span></span></div>
-                        <div class="cert-org">Corporación del Perú</div>
-                        <div class="cert-title">Certificado de Estudios</div>
-                        <p class="cert-lead">La Dirección Académica certifica que:</p>
-                    </div>
-
-                    <div class="cert-name">MANUEL ANTONIO RAMOS DONAYRE</div>
-
-                    <div class="cert-body">
-                        Ha concluido en forma satisfactoria sus estudios académicos correspondientes al:<br><br>
-                        <b>DIPLOMADO: FORMULACIÓN Y EVALUACIÓN DE ESTUDIOS DE PRE INVERSIÓN EN EL MARCO DEL SISTEMA NACIONAL DE INVERSIÓN PÚBLICA - SECTOR SALUD</b><br><br>
-                        Cumpliendo con los requisitos de evaluación establecidos.
-                    </div>
-
-                    <table class="cert-grades">
-                        <thead>
-                            <tr>
-                                <th>TEMÁTICA CURRICULAR</th>
-                                <th>NOTA</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Normatividad del sistema nacional de inversión pública</td><td>17</td></tr>
-                            <tr><td>Formulación de los estudios de pre inversión en salud</td><td>16</td></tr>
-                            <tr><td>Evaluación de estudios de pre inversión en salud</td><td>17</td></tr>
-                            <tr><td>Elaboración de estudios de pre inversión a nivel de perfil</td><td>17</td></tr>
-                            <tr><td>Aplicativos informáticos para programación de inversiones</td><td>16</td></tr>
-                            <tr><td>Gestión de impactos ambientales y sociales</td><td>17</td></tr>
-                            <tr><td>Análisis de sostenibilidad presupuestal</td><td>17</td></tr>
-                            <tr class="avg">
-                                <td>PROMEDIO FINAL</td>
-                                <td>17</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="cert-foot">
-                        <div>
-                            <strong>C: 12-012-EN-26</strong><br>
-                            Registro N° 01<br>
-                            <strong>C.A: R-359-26</strong><br>
-                            DNI N° 21400211
-                        </div>
-                        <div style="text-align: right;">
-                            Realizado del 09 de Junio al 09 de Agosto del 2025.<br>
-                            Duración: 02 meses (240 Horas Lectivas).<br>
-                            Huancayo, 09 de Agosto del 2025
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+<!-- ============ LOGIN ============ -->
+<div class="page active" id="page-login" style="display:block;">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-mark"><span></span><span></span></div>
+      <h2>Corporación del Perú</h2>
+      <p class="sub">Sistema interno de certificados y matrículas</p>
+      <div class="field">
+        <label>Usuario</label>
+        <input id="login-user" placeholder="asesor" value="asesor">
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••" value="cdp2026">
+      </div>
+      <p class="login-error" id="login-error">Usuario o contraseña incorrectos.</p>
+      <button class="btn-login" id="btn-login">Ingresar</button>
+      <div class="login-hint">DEMO — usuario: asesor · contraseña: cdp2026</div>
+      <div class="login-public">¿Vienes a validar un certificado? <a id="link-public">Ir a verificación pública →</a></div>
     </div>
+  </div>
+</div>
 
-    <!-- Scripts de interactividad -->
-    <script>
-        function switchView(viewName) {
-            // Ocultar todos
-            document.getElementById('view-inscripcion').classList.add('d-none');
-            document.getElementById('view-inscripcion').classList.remove('d-block', 'd-block-print');
-            document.getElementById('view-boleta').classList.add('d-none');
-            document.getElementById('view-boleta').classList.remove('d-block', 'd-block-print');
-            document.getElementById('view-certificado').classList.add('d-none');
-            document.getElementById('view-certificado').classList.remove('d-block', 'd-block-print');
-            
-            // Quitar clase active del nav
-            document.getElementById('tab-inscripcion').classList.remove('active');
-            document.getElementById('tab-boleta').classList.remove('active');
-            document.getElementById('tab-certificado').classList.remove('active');
+<!-- ============ APP SHELL ============ -->
+<div class="shell" id="app-shell" style="display:none;">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><span></span><span></span></div>
+      <div class="brand-text"><p class="eyebrow">Corporación del Perú</p><h1>Sistema de<br>Certificados</h1></div>
+    </div>
+    <div class="who"><b>Sr. Juan Quispe A.</b>Asesor académico · Sede Huancayo</div>
+    <nav>
+      <button class="nav-btn active" data-page="dashboard">📋 Alumnos inscritos</button>
+      <button class="nav-btn" data-page="inscripcion">➕ Nueva inscripción</button>
+      <button class="nav-btn" data-page="cursos">📚 Mantenedor de Cursos</button>
+    </nav>
+    <button class="logout-btn" id="btn-logout">Cerrar sesión</button>
+  </aside>
 
-            // Mostrar el seleccionado
-            document.getElementById('view-' + viewName).classList.remove('d-none');
-            document.getElementById('view-' + viewName).classList.add('d-block', 'd-block-print'); 
-            document.getElementById('tab-' + viewName).classList.add('active');
-        }
+  <main>
+    <!-- PAGE: dashboard.php -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-head">
+        <div><p class="page-eyebrow">dashboard.php</p><h2>Alumnos inscritos</h2><p>Listado general. Selecciona un alumno para registrar notas o emitir su certificado.</p></div>
+        <button class="btn btn-gold" id="btn-ir-inscripcion">+ Nueva inscripción</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <thead><tr><th>Correlativo</th><th>Alumno</th><th>DNI</th><th>Curso</th><th>Pago</th><th>Estado</th></tr></thead>
+          <tbody id="tbl-inscripciones"></tbody>
+        </table>
+      </div>
+    </section>
 
-        function simularRegistro(event) {
-            event.preventDefault(); 
-            
-            const dni = document.getElementById('insDni').value;
-            const nombres = document.getElementById('insNombres').value;
-            const curso = document.getElementById('insCurso').value;
-            const monto = parseFloat(document.getElementById('insMonto').value).toFixed(2);
-            
-            const now = new Date();
-            const fecha = now.toLocaleDateString('es-PE');
-            const hora = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-            const boletaNum = Math.floor(Math.random() * 90000) + 10000;
+    <!-- PAGE: inscripcion.php -->
+    <section class="page" id="page-inscripcion">
+      <button class="back-link" data-back="dashboard">← Volver al listado</button>
+      <div class="page-head">
+        <div><p class="page-eyebrow">inscripcion.php</p><h2 id="inscripcion-titulo">Nueva inscripción</h2><p>Registra el ingreso del alumno y autogenera su comprobante de pago.</p></div>
+      </div>
+      <div class="notice" id="alumno-existente-aviso" style="display:none;">
+        <span>ⓘ</span><span>Este DNI ya está registrado — se conservarán sus datos de cliente y se creará una nueva matrícula.</span>
+      </div>
+      <div class="card">
+        <div class="grid2">
+          <div class="field"><label>Apellidos y nombres</label><input id="f-nombre" placeholder="Ej. Ramos Donayre, Manuel Antonio"></div>
+          <div class="field"><label>DNI</label><input id="f-dni" placeholder="21400211" maxlength="8"></div>
+          <div class="field"><label>Celular</label><input id="f-cel" placeholder="956724100"></div>
+          <div class="field"><label>Sede</label><select id="f-sede"><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Curso / Diplomado (Selecciona del Mantenedor)</label>
+            <select id="f-curso" onchange="actualizarPrecioCurso()"></select>
+          </div>
+          <div class="field"><label>Modalidad</label><select id="f-modalidad"><option>Distancia (D)</option><option>Presencial</option><option>Virtual</option></select></div>
+          <div class="field"><label>Monto total del curso (S/)</label><input id="f-monto" type="number" value="270"></div>
+          <div class="field"><label>Paga ahora — adelanto (S/)</label><input id="f-adelanto" type="number" value="270" oninput="previewSaldo()"></div>
+          <div class="field"><label>Forma de pago</label>
+            <select id="f-pago"><option>Efectivo</option><option>Yape</option><option>Transferencia BCP</option><option>Transferencia Banco de la Nación</option></select>
+          </div>
+        </div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--navy);margin:2px 0 16px;">
+          Saldo pendiente tras este pago: <b id="saldo-preview">S/ 0.00</b>
+        </p>
+        <button class="btn btn-primary" id="btn-inscribir">Guardar inscripción y emitir boleta</button>
+      </div>
+    </section>
 
-            document.getElementById('bolNumero').innerText = "00" + boletaNum;
-            document.getElementById('bolDni').innerText = dni;
-            document.getElementById('bolNombres').innerText = nombres;
-            document.getElementById('bolCurso').innerText = "Inscripción:\n" + curso;
-            document.getElementById('bolTotal').innerText = monto;
-            document.getElementById('bolFecha').innerText = fecha;
-            document.getElementById('bolHora').innerText = hora;
+    <!-- PAGE: cursos.php (NUEVO MANTENEDOR) -->
+    <section class="page" id="page-cursos">
+      <div class="page-head">
+        <div><p class="page-eyebrow">cursos.php</p><h2>Mantenedor de Cursos</h2><p>Administra los cursos/diplomados disponibles, horas lectivas, costos y plan temático para los certificados.</p></div>
+      </div>
+      <div class="card">
+        <h3>Registrar / Editar Curso</h3>
+        <form id="form-curso" onsubmit="guardarCurso(event)">
+          <div class="grid2">
+            <div class="field" style="grid-column:1/-1;"><label>Nombre completo del curso o diplomado</label><input id="c-nombre" required placeholder="Ej. Diplomado en Gestión de Impactos Ambientales"></div>
+            <div class="field"><label>Horas lectivas</label><input id="c-horas" type="number" value="240" required></div>
+            <div class="field"><label>Precio / Costo oficial (S/)</label><input id="c-monto" type="number" value="270" required></div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Temario / Módulos (Uno por línea)</label>
+              <textarea id="c-temas" rows="4" required placeholder="Normatividad del sector&#10;Evaluación de impacto&#10;Gestión presupuestal"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-gold">+ Guardar Curso en Catálogo</button>
+        </form>
+      </div>
 
-            // Cambiar a la vista de Boleta automáticamente
-            switchView('boleta');
-        }
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table style="width:100%;">
+          <thead><tr><th>Código</th><th>Curso / Diplomado</th><th>Horas</th><th>Costo</th><th>Módulos</th></tr></thead>
+          <tbody id="tbl-cursos"></tbody>
+        </table>
+      </div>
+    </section>
 
-        function mostrarCertificado() {
-            const dni = document.getElementById('inputBuscarCert').value;
-            if(dni === '21400211') {
-                document.getElementById('certBuscador').classList.add('d-none');
-                document.getElementById('certPlantilla').classList.remove('d-none');
-            } else {
-                alert("Para este demo interactivo, por favor ingresa el DNI: 21400211");
-            }
-        }
+    <!-- PAGE: alumno.php?id= -->
+    <section class="page" id="page-alumno">
+      <button class="back-link" data-back="dashboard">← Volver al listado</button>
+      <div class="page-head">
+        <div><p class="page-eyebrow" id="alumno-eyebrow">alumno.php?id=</p><h2 id="alumno-nombre">—</h2><p id="alumno-curso"></p></div>
+      </div>
 
-        function ocultarCertificado() {
-            document.getElementById('certBuscador').classList.remove('d-none');
-            document.getElementById('certPlantilla').classList.add('d-none');
-            document.getElementById('inputBuscarCert').value = '';
-        }
+      <div class="card">
+        <h3>Historial de Pagos</h3>
+        <div id="pagos-wrap"></div>
+      </div>
 
-        function imprimirSeccion() {
-            window.print();
-        }
-    </script>
+      <div class="card">
+        <h3>Registro de Notas y Módulos</h3>
+        <div id="notas-form-wrap"></div>
+      </div>
+
+      <div class="card">
+        <h3>Emisión de Certificado Oficial</h3>
+        <button class="btn btn-gold" id="btn-generar-cert">Firmar digitalmente y emitir certificado (HMAC-SHA256)</button>
+        <div class="notice" id="cert-help" style="margin-top:14px;display:none;"><span>ⓘ</span><span id="cert-help-txt"></span></div>
+        <div id="cert-output" style="margin-top:18px;"></div>
+      </div>
+    </section>
+
+    <!-- PAGE: boleta.php?id= -->
+    <section class="page" id="page-boleta">
+      <button class="back-link" data-back="dashboard">← Volver al listado</button>
+      <div class="page-head">
+        <div><p class="page-eyebrow" id="boleta-eyebrow">boleta.php?id=</p><h2>Boleta Electrónica</h2><p>Generada automáticamente al procesar el pago.</p></div>
+      </div>
+      <div class="boleta-wrap" id="boleta-output"></div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn btn-ghost" onclick="window.print()">🖨️ Imprimir Boleta</button>
+        <button class="btn btn-primary" id="btn-continuar-alumno">Continuar a ficha del alumno →</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ PUBLIC: verificar.php ============ -->
+<div class="public-page" id="page-verificar" style="display:none;">
+  <div class="public-header">
+    <div class="brand-mark"><span></span><span></span></div>
+    <div><p class="eyebrow">Corporación del Perú</p><h1>Verificación Pública de Certificados</h1></div>
+  </div>
+  <div class="public-body">
+    <p style="color:var(--muted);font-size:13.5px;line-height:1.6;">Ingresa el código impreso en el diploma o el correlativo para autenticar los datos académicos.</p>
+    <div class="verify-search">
+      <input id="verify-input" placeholder="Ej. R-359-26 o Código Hex">
+      <button class="btn btn-primary" id="btn-verificar">Verificar</button>
+    </div>
+    <div class="verify-result" id="verify-result"></div>
+    <div class="back-to-login"><a id="link-to-login">← Acceso para personal (Login)</a></div>
+  </div>
+</div>
+
+<script>
+const SECRET_KEY = "corporacion-del-peru-demo-secret-2026";
+const AUTH = { user: "asesor", pass: "cdp2026" };
+
+/* BD Simulada */
+const DB = {
+  seq: 359,
+  boletaSeq: 122,
+  cursos: [
+    {
+      id: "CUR-01",
+      nombre: "Formulación y evaluación de estudios de pre inversión en el marco del Sistema Nacional de Inversión Pública – Sector Salud",
+      horas: 240,
+      monto: 270,
+      temas: [
+        "Normatividad del Sistema Nacional de Inversión Pública",
+        "Formulación de los estudios de pre inversión en salud",
+        "Evaluación de estudios de pre inversión en salud",
+        "Elaboración de estudios de pre inversión a nivel de perfil",
+        "Aplicativos informáticos para oficinas de programación de inversiones",
+        "Gestión de impactos ambientales y sociales",
+        "Análisis de sostenibilidad presupuestal: compromisos de operación y mantenimiento"
+      ]
+    },
+    {
+      id: "CUR-02",
+      nombre: "Curso Especializado en Gestión de Impactos Ambientales y Sociales",
+      horas: 180,
+      monto: 220,
+      temas: [
+        "Marco Normativo Ambiental Vigente",
+        "Evaluación y Prevención de Impactos Ambientales",
+        "Planes de Manejo Socio-Ambiental en Obras Públicas",
+        "Fiscalización, Control y Sostenibilidad"
+      ]
+    }
+  ],
+  inscripciones: []
+};
+
+// Cargar registro inicial
+DB.inscripciones.push({
+  correlativo: "R-359-26",
+  nombre: "Ramos Donayre, Manuel Antonio",
+  dni: "21400211",
+  celular: "956724100",
+  sede: "Marcona",
+  curso: DB.cursos[0].nombre,
+  modalidad: "Distancia (D)",
+  monto: 270,
+  fechaInicio: "09/06/2025",
+  fechaFin: "09/08/2025",
+  horas: 240,
+  temas: DB.cursos[0].temas.map(t => ({ nombre: t, nota: 17 })),
+  certificado: null,
+  pagos: [
+    { serie:"B001", numero:"000098", fecha:"07/01/2026", hora:"10:15", formaPago:"Yape", monto:200, tipo:"Inscripción" },
+    { serie:"B001", numero:"000114", fecha:"14/01/2026", hora:"16:40", formaPago:"Transferencia BCP", monto:70, tipo:"Regularización" }
+  ],
+  ultimaBoleta: null
+});
+
+function promedio(temas){ 
+  const valids = temas.filter(t => t.nota !== "" && !isNaN(t.nota));
+  if(!valids.length) return null; 
+  return Math.round((valids.reduce((a,t)=>a+Number(t.nota),0)/valids.length)*100)/100; 
+}
+
+async function hmacSHA256Hex(message, key){
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey("raw", enc.encode(key), { name:"HMAC", hash:"SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", cryptoKey, enc.encode(message));
+  return Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,"0")).join("").toUpperCase();
+}
+
+/* Router */
+const urls = {
+  login: "sistema.corporaciondelperu.com/login.php",
+  dashboard: "sistema.corporaciondelperu.com/dashboard.php",
+  inscripcion: "sistema.corporaciondelperu.com/inscripcion.php",
+  cursos: "sistema.corporaciondelperu.com/cursos.php",
+  boleta: "sistema.corporaciondelperu.com/boleta.php?id=",
+  alumno: "sistema.corporaciondelperu.com/alumno.php?id=",
+  verificar: "verifica.corporaciondelperu.com/"
+};
+
+let currentAlumnoId = null;
+const INTERNAL_PAGES = ["dashboard","inscripcion","cursos","boleta","alumno"];
+
+function goto(page, opts){
+  document.getElementById("page-login").style.display = page==="login" ? "block":"none";
+  document.getElementById("app-shell").style.display = INTERNAL_PAGES.includes(page) ? "grid":"none";
+  document.getElementById("page-verificar").style.display = page==="verificar" ? "block":"none";
+
+  if(INTERNAL_PAGES.includes(page)){
+    document.querySelectorAll("#app-shell .page").forEach(p=>p.classList.remove("active"));
+    document.getElementById("page-"+page).classList.add("active");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.page===page));
+  }
+  
+  document.getElementById("url-text").textContent = urls[page] + ((page==="alumno"||page==="boleta") ? (opts?.id||"") : "");
+  
+  if(page==="dashboard") renderDashboard();
+  if(page==="cursos") renderCursos();
+  if(page==="boleta") renderBoleta(opts.id);
+  if(page==="alumno") { currentAlumnoId = opts.id; renderAlumno(opts.id); }
+  if(page==="inscripcion") renderInscripcionForm(opts?.prefillDni);
+}
+
+/* Eventos Navegación */
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => goto(btn.dataset.page));
+});
+document.getElementById("btn-ir-inscripcion").addEventListener("click", () => goto("inscripcion"));
+document.getElementById("btn-login").addEventListener("click", () => {
+  const u = document.getElementById("login-user").value;
+  const p = document.getElementById("login-pass").value;
+  if(u === AUTH.user && p === AUTH.pass){
+    goto("dashboard");
+  } else {
+    document.getElementById("login-error").style.display = "block";
+  }
+});
+document.getElementById("btn-logout").addEventListener("click", () => goto("login"));
+document.getElementById("link-public").addEventListener("click", () => goto("verificar"));
+document.getElementById("link-to-login").addEventListener("click", () => goto("login"));
+document.querySelectorAll(".back-link").forEach(b => b.addEventListener("click", () => goto(b.dataset.back)));
+
+/* MANTENEDOR DE CURSOS */
+function renderCursos(){
+  const tbody = document.getElementById("tbl-cursos");
+  tbody.innerHTML = DB.cursos.map(c => `
+    <tr>
+      <td><b style="font-family:'JetBrains Mono';">${c.id}</b></td>
+      <td><b>${c.nombre}</b></td>
+      <td>${c.horas} hrs</td>
+      <td>S/ ${parseFloat(c.monto).toFixed(2)}</td>
+      <td><span class="pill pill-cert">${c.temas.length} Módulos</span></td>
+    </tr>
+  `).join("");
+}
+
+function guardarCurso(e){
+  e.preventDefault();
+  const nombre = document.getElementById("c-nombre").value;
+  const horas = parseInt(document.getElementById("c-horas").value);
+  const monto = parseFloat(document.getElementById("c-monto").value);
+  const temasRaw = document.getElementById("c-temas").value;
+  const temas = temasRaw.split("\n").map(t=>t.trim()).filter(t=>t.length>0);
+
+  const newId = `CUR-0${DB.cursos.length + 1}`;
+  DB.cursos.push({ id: newId, nombre, horas, monto, temas });
+
+  document.getElementById("form-curso").reset();
+  renderCursos();
+  alert("Curso registrado con éxito en el catálogo.");
+}
+
+/* INSCRIPCIÓN DE ALUMNOS */
+function renderInscripcionForm(prefillDni){
+  const selectCurso = document.getElementById("f-curso");
+  selectCurso.innerHTML = DB.cursos.map(c => `<option value="${c.id}">${c.nombre} (S/ ${c.monto})</option>`).join("");
+  
+  if(prefillDni){
+    const prev = DB.inscripciones.find(x => x.dni === prefillDni);
+    if(prev){
+      document.getElementById("f-nombre").value = prev.nombre;
+      document.getElementById("f-dni").value = prev.dni;
+      document.getElementById("f-cel").value = prev.celular;
+      document.getElementById("alumno-existente-aviso").style.display = "flex";
+    }
+  } else {
+    document.getElementById("alumno-existente-aviso").style.display = "none";
+  }
+  actualizarPrecioCurso();
+}
+
+function actualizarPrecioCurso(){
+  const cId = document.getElementById("f-curso").value;
+  const cursoObj = DB.cursos.find(c => c.id === cId);
+  if(cursoObj){
+    document.getElementById("f-monto").value = cursoObj.monto;
+    document.getElementById("f-adelanto").value = cursoObj.monto;
+    previewSaldo();
+  }
+}
+
+function previewSaldo(){
+  const m = parseFloat(document.getElementById("f-monto").value || 0);
+  const a = parseFloat(document.getElementById("f-adelanto").value || 0);
+  document.getElementById("saldo-preview").textContent = `S/ ${(m - a).toFixed(2)}`;
+}
+
+document.getElementById("btn-inscribir").addEventListener("click", () => {
+  const nombre = document.getElementById("f-nombre").value;
+  const dni = document.getElementById("f-dni").value;
+  const cId = document.getElementById("f-curso").value;
+  const cursoObj = DB.cursos.find(c => c.id === cId);
+  const monto = parseFloat(document.getElementById("f-monto").value);
+  const adelanto = parseFloat(document.getElementById("f-adelanto").value);
+  const formaPago = document.getElementById("f-pago").value;
+
+  if(!nombre || !dni) return alert("Por favor complete los campos obligatorios.");
+
+  DB.seq++;
+  DB.boletaSeq++;
+  const correlativo = `R-${DB.seq}-26`;
+  const now = new Date();
+
+  const nuevaBoleta = {
+    serie: "B001",
+    numero: String(DB.boletaSeq).padStart(6, "0"),
+    fecha: now.toLocaleDateString("es-PE"),
+    hora: now.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" }),
+    formaPago,
+    monto: adelanto,
+    tipo: "Inscripción"
+  };
+
+  const nuevoAlumno = {
+    correlativo,
+    nombre,
+    dni,
+    celular: document.getElementById("f-cel").value,
+    sede: document.getElementById("f-sede").value,
+    curso: cursoObj.nombre,
+    modalidad: document.getElementById("f-modalidad").value,
+    monto,
+    fechaInicio: now.toLocaleDateString("es-PE"),
+    fechaFin: "—",
+    horas: cursoObj.horas,
+    temas: cursoObj.temas.map(t => ({ nombre: t, nota: "" })),
+    certificado: null,
+    pagos: [nuevaBoleta],
+    ultimaBoleta: nuevaBoleta
+  };
+
+  DB.inscripciones.push(nuevoAlumno);
+  goto("boleta", { id: correlativo });
+});
+
+/* DASHBOARD */
+function renderDashboard(){
+  const tbody = document.getElementById("tbl-inscripciones");
+  tbody.innerHTML = DB.inscripciones.map(r => {
+    const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
+    const pend = r.monto - pagado;
+    const estPill = pend <= 0 ? `<span class="pill pill-ok">Pagado</span>` : `<span class="pill pill-pend">Debe S/ ${pend.toFixed(2)}</span>`;
+    const certPill = r.certificado ? `<span class="pill pill-cert">Firmado</span>` : `<span class="pill" style="background:#eee;">Pendiente</span>`;
+
+    return `
+      <tr class="link-row" onclick="goto('alumno', {id:'${r.correlativo}'})">
+        <td><b style="font-family:'JetBrains Mono';">${r.correlativo}</b></td>
+        <td><b>${r.nombre}</b></td>
+        <td>${r.dni}</td>
+        <td style="max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.curso}</td>
+        <td>${estPill}</td>
+        <td>${certPill}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+/* BOLETA */
+function renderBoleta(id){
+  const r = DB.inscripciones.find(x => x.correlativo === id);
+  if(!r) return;
+  const b = r.ultimaBoleta || r.pagos[0];
+
+  document.getElementById("boleta-output").innerHTML = `
+    <div class="ticket">
+      <div class="t-center">
+        <div class="t-org">CORPORACIÓN DEL PERÚ</div>
+        <div class="t-sub">RUC: 20100227461<br>Sede ${r.sede} · Sistema Académico</div>
+        <hr>
+        <div style="font-weight:700;">BOLETA DE VENTA ELECTRÓNICA</div>
+        <div class="t-serie">${b.serie}-${b.numero}</div>
+      </div>
+      <hr>
+      <div class="t-row"><span>FECHA:</span><span>${b.fecha} ${b.hora}</span></div>
+      <div class="t-row"><span>DNI:</span><span>${r.dni}</span></div>
+      <div class="t-row"><span>ALUMNO:</span><span>${r.nombre}</span></div>
+      <div class="t-row"><span>FORMA DE PAGO:</span><span>${b.formaPago}</span></div>
+      <hr>
+      <div class="t-detail">
+        <div class="d-title">CONCEPTO:</div>
+        <div>${b.tipo} - ${r.curso}</div>
+      </div>
+      <div class="t-total"><span>TOTAL PAGADO:</span><span>S/ ${b.monto.toFixed(2)}</span></div>
+      <div class="t-foot">¡Gracias por su inscripción!<br>verificación: sistema.corporaciondelperu.com</div>
+    </div>
+  `;
+  document.getElementById("btn-continuar-alumno").onclick = () => goto("alumno", { id });
+}
+
+/* FICHA DEL ALUMNO */
+function renderAlumno(id){
+  const r = DB.inscripciones.find(x => x.correlativo === id);
+  if(!r) return;
+
+  document.getElementById("alumno-nombre").textContent = r.nombre;
+  document.getElementById("alumno-curso").textContent = `${r.curso} (${r.modalidad})`;
+
+  // Render Pagos
+  const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
+  const saldo = r.monto - pagado;
+  document.getElementById("pagos-wrap").innerHTML = `
+    <p><b>Monto Total:</b> S/ ${r.monto.toFixed(2)} | <b>Pagado:</b> S/ ${pagado.toFixed(2)} | <b>Saldo:</b> <span style="color:${saldo>0?'var(--stamp)':'var(--success)'}">S/ ${saldo.toFixed(2)}</span></p>
+    <table>
+      <thead><tr><th>Comprobante</th><th>Fecha</th><th>Forma Pago</th><th>Monto</th></tr></thead>
+      <tbody>
+        ${r.pagos.map(p=>`<tr><td>${p.serie}-${p.numero}</td><td>${p.fecha}</td><td>${p.formaPago}</td><td>S/ ${p.monto.toFixed(2)}</td></tr>`).join("")}
+      </tbody>
+    </table>
+  `;
+
+  // Render Notas
+  document.getElementById("notas-form-wrap").innerHTML = `
+    <table style="margin-bottom:12px;">
+      <thead><tr><th>Módulo / Temática Curricular</th><th style="width:100px;">Nota (0-20)</th></tr></thead>
+      <tbody>
+        ${r.temas.map((t,idx)=>`
+          <tr>
+            <td>${t.nombre}</td>
+            <td><input type="number" min="0" max="20" value="${t.nota}" onchange="guardarNota('${r.correlativo}', ${idx}, this.value)"></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+
+  // Certificado estado
+  const btnCert = document.getElementById("btn-generar-cert");
+  btnCert.onclick = () => emitirCertificado(r.correlativo);
+  
+  if(r.certificado){
+    renderCertificadoVista(r);
+  } else {
+    document.getElementById("cert-output").innerHTML = "";
+  }
+}
+
+function guardarNota(correlativo, idx, val){
+  const r = DB.inscripciones.find(x => x.correlativo === correlativo);
+  r.temas[idx].nota = val ? parseInt(val) : "";
+}
+
+async function emitirCertificado(correlativo){
+  const r = DB.inscripciones.find(x => x.correlativo === correlativo);
+  const prom = promedio(r.temas);
+  if(prom === null) return alert("Por favor ingrese las notas de los módulos antes de emitir.");
+
+  const fecha = new Date().toISOString().slice(0,10);
+  const hash = await hmacSHA256Hex(`${r.correlativo}|${r.dni}|${r.nombre}|${prom}|${fecha}`, SECRET_KEY);
+  r.certificado = { codigoVerif: hash.slice(0,12), promedio: prom, fechaEmision: fecha };
+  
+  renderCertificadoVista(r);
+}
+
+function renderCertificadoVista(r){
+  const certDiv = document.getElementById("cert-output");
+  certDiv.innerHTML = `
+    <div class="cert-wrap">
+      <div class="cert-top">
+        <div class="cert-mark"><span></span><span></span></div>
+        <div class="cert-org">Corporación del Perú</div>
+        <div class="cert-title">CERTIFICADO DE ESTUDIOS</div>
+        <p class="cert-lead">La Dirección Académica certifica que:</p>
+      </div>
+      <div class="cert-name">${r.nombre}</div>
+      <div class="cert-body">Ha concluido satisfactoriamente los estudios correspondientes al <b>${r.curso.toUpperCase()}</b>.</div>
+      <table class="cert-grades">
+        <thead><tr><th>MÓDULO</th><th>NOTA</th></tr></thead>
+        <tbody>
+          ${r.temas.map(t=>`<tr><td>${t.nombre}</td><td>${t.nota || '—'}</td></tr>`).join("")}
+          <tr class="avg"><td>PROMEDIO FINAL</td><td>${r.certificado.promedio}</td></tr>
+        </tbody>
+      </table>
+      <div class="cert-foot">
+        <div>
+          <b>CÓDIGO:</b> ${r.correlativo}<br>
+          <b>VERIFICACIÓN:</b> ${r.certificado.codigoVerif}<br>
+          DNI: ${r.dni}
+        </div>
+        <div class="cert-sign">
+          <div class="line"></div>
+          Dirección Académica
+        </div>
+        <div class="cert-qr">
+          <div id="qrcode"></div>
+          <div class="code">${r.certificado.codigoVerif}</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ Imprimir Certificado PDF</button>
+    </div>
+  `;
+
+  new QRCode(document.getElementById("qrcode"), {
+    text: `https://verifica.corporaciondelperu.com/?code=${r.certificado.codigoVerif}`,
+    width: 64, height: 64
+  });
+}
+
+/* VERIFICACIÓN PÚBLICA */
+document.getElementById("btn-verificar").addEventListener("click", () => {
+  const query = document.getElementById("verify-input").value.trim().toUpperCase();
+  const resDiv = document.getElementById("verify-result");
+  
+  const match = DB.inscripciones.find(x => x.certificado && (x.certificado.codigoVerif.toUpperCase() === query || x.correlativo.toUpperCase() === query));
+
+  if(match){
+    resDiv.className = "verify-result show ok";
+    resDiv.innerHTML = `
+      <div class="verify-head"><div class="verify-icon">✓</div><h4>Certificado Auténtico y Válido</h4></div>
+      <div class="verify-detail">
+        <div><dt>Alumno:</dt><dd>${match.nombre}</dd></div>
+        <div><dt>DNI:</dt><dd>${match.dni}</dd></div>
+        <div><dt>Curso:</dt><dd>${match.curso}</dd></div>
+        <div><dt>Promedio:</dt><dd>${match.certificado.promedio}</dd></div>
+        <div><dt>Código Firma:</dt><dd>${match.certificado.codigoVerif}</dd></div>
+      </div>
+    `;
+  } else {
+    resDiv.className = "verify-result show bad";
+    resDiv.innerHTML = `
+      <div class="verify-head"><div class="verify-icon">✕</div><h4>Documento No Encontrado</h4></div>
+      <p style="font-size:13px;margin:0;">El código ingresado no coincide con ningún certificado emitido en nuestros registros.</p>
+    `;
+  }
+});
+
+// Inicialización
+goto("login");
+</script>
 </body>
 </html>
