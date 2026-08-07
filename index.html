@@ -3,63 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Académico - Corporación del Perú</title>
-    <!-- Bootstrap 5 -->
+    <title>Sistema Académico · Corporación del Perú</title>
+    <!-- Bootstrap 5 para el layout base -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fuentes del nuevo tema -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* ================= TEMA INSTITUCIONAL ================= */
+        :root {
+            --navy: #1B2A4A; 
+            --navy-deep: #101A2E; 
+            --navy-soft: #2C3F63;
+            --paper: #F6F5F0; 
+            --paper-line: #E3DFD2;
+            --gold: #A9822F; 
+            --gold-soft: #C9A84C;
+            --stamp: #A23B2E;
+            --ink: #20242C; 
+            --muted: #6B7280;
+            --success: #3F6B4F; 
+            --success-bg: #EAF2EC;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--paper); 
+            color: var(--ink); 
+            min-height: 100vh; 
+            -webkit-font-smoothing: antialiased; 
+        }
+
+        h1, h2, h3, h4, .font-serif { font-family: 'Fraunces', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ---------- Navegación Superior ---------- */
+        .navbar { background: var(--navy-deep) !important; padding: 15px 0; border-bottom: 3px solid var(--gold); }
+        .navbar-brand { color: #fff !important; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px;}
+        .navbar-brand span { color: var(--gold-soft); }
+        .nav-link { color: #B7C0D4 !important; font-weight: 500; font-size: 14px; padding: 10px 15px; border-radius: 8px; margin-left: 5px;}
+        .nav-link:hover { background: rgba(255,255,255,.06); color: #fff !important; }
+        .nav-link.active { background: rgba(201,168,76,.16); color: #fff !important; }
+
+        /* ---------- Tarjetas y Formularios ---------- */
+        .card { background: #fff; border: 1px solid var(--paper-line); border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); }
+        label { display: block; font-size: 12.5px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #D8D4C6; border-radius: 7px; font-size: 14px; color: var(--ink); background: #FBFAF7; }
+        input:focus, select:focus { outline: 2px solid var(--gold-soft); outline-offset: 1px; border-color: var(--gold); }
         
-        /* Estilos de la barra de navegación */
-        .navbar-brand { font-weight: bold; color: #0b2e59 !important; }
-        .nav-link.active { font-weight: bold; border-bottom: 2px solid #0b2e59; color: #0b2e59 !important; }
+        /* ---------- Botones ---------- */
+        .btn-custom { font-weight: 600; font-size: 13.5px; padding: 12px 20px; border-radius: 7px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Inter', sans-serif;}
+        .btn-primary-custom { background: var(--navy); color: #fff; }
+        .btn-primary-custom:hover { background: var(--navy-soft); color: #fff;}
+        .btn-gold-custom { background: var(--gold); color: #fff; }
+        .btn-gold-custom:hover { background: #96721F; color:#fff;}
+        .btn-ghost-custom { background: transparent; color: var(--navy); border: 1px solid var(--paper-line); }
+        .btn-ghost-custom:hover { background: #F1EFE6; color: var(--navy);}
+
+        /* ---------- Diseño Boleta (Ticket Térmico) ---------- */
+        .boleta-wrap { display: flex; justify-content: center; padding: 20px 0; }
+        .ticket {
+            width: 340px; background: #fff; border: 1px solid var(--paper-line);
+            padding: 25px 20px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink);
+            box-shadow: 0 18px 40px -20px rgba(16,26,46,.3);
+            background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(0,0,0,.015) 27px, rgba(0,0,0,.015) 28px);
+        }
+        .ticket .t-center { text-align: center; }
+        .ticket .t-org { font-weight: 700; font-size: 14px; letter-spacing: .03em; }
+        .ticket .t-sub { color: var(--muted); font-size: 10px; line-height: 1.5; }
+        .ticket hr { border: none; border-top: 1px dashed #C7C2B1; margin: 12px 0; }
+        .ticket .t-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; line-height: 1.55; }
+        .ticket .t-row span:first-child { color: var(--muted); }
+        .ticket .t-row span:last-child { text-align: right; }
+        .ticket .t-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; color: var(--navy); margin-top: 10px; border-top: 1px dashed #C7C2B1; padding-top: 10px;}
+        .ticket .t-foot { text-align: center; font-size: 9.5px; color: var(--muted); margin-top: 20px; line-height: 1.6; }
+
+        /* ---------- Diseño Certificado ---------- */
+        .cert-wrap { 
+            background: #fff; border: 1px solid var(--paper-line); border-radius: 4px; 
+            padding: 50px 60px 40px; position: relative; overflow: hidden; 
+            box-shadow: 0 22px 46px -22px rgba(16,26,46,.35); 
+            max-width: 900px; margin: 0 auto;
+        }
+        .cert-wrap::before { content: ""; position: absolute; inset: 12px; border: 1.5px solid var(--gold-soft); border-radius: 2px; pointer-events: none; }
+        .cert-wrap::after { content: ""; position: absolute; inset: 18px; border: 1px solid #E9E2CC; border-radius: 2px; pointer-events: none; }
         
-        /* Estilos generales de tarjetas */
-        .module-card { background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; margin-bottom: 20px; }
+        .cert-top { text-align: center; margin-bottom: 15px; }
+        .cert-mark { width: 55px; height: 55px; margin: 0 auto 12px; position: relative; }
+        .cert-mark span { position: absolute; border: 2px solid var(--gold); border-radius: 50%; }
+        .cert-mark span:nth-child(1) { width: 55px; height: 55px; }
+        .cert-mark span:nth-child(2) { width: 37px; height: 37px; top: 9px; left: 9px; border-color: var(--navy); }
         
-        /* Diseño de la Boleta de Pago */
-        .boleta-container { max-width: 500px; margin: 0 auto; border: 1px dashed #666; padding: 20px; background: #fff; font-family: 'Courier New', Courier, monospace; }
-        .boleta-header { text-align: center; border-bottom: 1px dashed #666; padding-bottom: 10px; margin-bottom: 15px; }
-        .boleta-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-        .boleta-total { font-weight: bold; font-size: 18px; border-top: 1px dashed #666; padding-top: 10px; margin-top: 10px; text-align: right; }
+        .cert-org { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+        .cert-title { font-family: 'Fraunces', serif; font-size: 16px; letter-spacing: .2em; text-transform: uppercase; color: var(--stamp); margin: 15px 0 5px; font-weight: 600; }
+        .cert-lead { font-size: 14px; color: var(--muted); margin: 0; }
+        .cert-name { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; text-align: center; color: var(--navy); margin: 20px 0 10px; border-bottom: 1px solid var(--paper-line); padding-bottom: 15px; text-transform: uppercase;}
+        .cert-body { font-size: 14px; line-height: 1.7; text-align: center; color: var(--ink); max-width: 65ch; margin: 0 auto 25px; }
         
-        /* Diseño del Certificado */
-        .cert-container { max-width: 850px; margin: 0 auto; background: #fff; padding: 40px 60px; border: 2px solid #333; position: relative; font-family: 'Arial', sans-serif;}
-        .cert-header { text-align: center; margin-bottom: 20px; }
-        .cert-header h1 { color: #0b2e59; font-weight: 700; text-transform: uppercase; font-size: 28px; margin: 0; }
-        .cert-header h3 { font-size: 18px; color: #444; letter-spacing: 1px; margin-top: 5px; }
-        .student-name { font-size: 22px; font-weight: bold; text-align: center; margin: 20px 0; text-decoration: underline; text-transform: uppercase;}
-        .course-name { font-size: 15px; font-weight: bold; text-align: center; margin: 15px 0; }
-        .grades-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .grades-table th, .grades-table td { border: 1px solid #666; padding: 6px 10px; font-size: 12px; }
-        .grades-table th { background-color: #f0f0f0; }
+        .cert-grades { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 0 auto 25px; max-width: 80%;}
+        .cert-grades th { font-size: 11.5px; font-weight: 500; text-align: left; color: var(--muted); border-bottom: 1px solid var(--paper-line); padding: 8px 6px; }
+        .cert-grades td { padding: 8px 6px; border-bottom: 1px solid #F3F1E9; color: var(--navy); font-weight: 500;}
+        .cert-grades td:last-child, .cert-grades th:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600;}
+        .cert-grades tr.avg td { font-weight: 700; color: var(--navy); border-top: 1.5px solid var(--navy); border-bottom: none; padding-top: 10px; font-size: 14px;}
         
-        /* Reglas de impresión */
+        .cert-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 35px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); line-height: 1.6;}
+        
+        /* ---------- Reglas de Impresión ---------- */
         @media print {
             body { background: #fff !important; }
             .no-print { display: none !important; }
-            .module-card { box-shadow: none; border: none; padding: 0; }
-            .boleta-container { border: 1px solid #000; }
-            .cert-container { border: none; padding: 0; width: 100%; }
-            /* Ocultar las pestañas no activas al imprimir */
+            .card { box-shadow: none; border: none; padding: 0; margin: 0; }
             #view-inscripcion, #view-boleta, #view-certificado { display: none; }
             .d-block-print { display: block !important; }
+            
+            /* Ajustes Ticket Impresión */
+            .ticket { position: absolute; top: 0; left: 50%; transform: translateX(-50%); box-shadow: none; border: 1px solid #000; background-image: none; }
+            /* Ajustes Certificado Impresión */
+            .cert-wrap { border: none; box-shadow: none; padding: 40px; width: 100%; max-width: none;}
         }
     </style>
 </head>
 <body>
 
-    <!-- Navegación (No se imprime) -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm no-print mb-4">
+    <!-- Navegación Superior -->
+    <nav class="navbar navbar-expand-lg no-print mb-5 shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="#">🎓 SisAcadémico</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="#">🎓 Corporación <span>del Perú</span></a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-link-item"><a class="nav-link active" href="#" id="tab-inscripcion" onclick="switchView('inscripcion')">1. Inscripciones</a></li>
-                    <li class="nav-link-item"><a class="nav-link" href="#" id="tab-boleta" onclick="switchView('boleta')">2. Boletas de Pago</a></li>
-                    <li class="nav-link-item"><a class="nav-link" href="#" id="tab-certificado" onclick="switchView('certificado')">3. Certificados</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#" id="tab-inscripcion" onclick="switchView('inscripcion')">1. Inscripción</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="tab-boleta" onclick="switchView('boleta')">2. Boleta</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="tab-certificado" onclick="switchView('certificado')">3. Certificado</a></li>
                 </ul>
             </div>
         </div>
@@ -71,50 +148,53 @@
              MÓDULO 1: INSCRIPCIONES
              ========================================== -->
         <div id="view-inscripcion" class="d-block">
-            <div class="module-card">
-                <h4 class="mb-4" style="color: #0b2e59;">Formulario de Inscripción / Matrícula</h4>
-                <div class="alert alert-info no-print">
-                    <strong>Demo:</strong> Ingresa los datos del alumno y haz clic en "Registrar y Generar Boleta".
-                </div>
-                
+            
+            <div class="mb-4">
+                <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">inscripcion.php</p>
+                <h2 style="color: var(--navy); margin:0;">Nueva Inscripción</h2>
+                <p style="color: var(--muted); font-size: 14px;">Ingresa los datos del alumno. Se generará un correlativo automático al guardar.</p>
+            </div>
+
+            <div class="card">
                 <form id="formInscripcion" onsubmit="simularRegistro(event)">
-                    <div class="row">
-                        <!-- Datos Personales -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">DNI</label>
-                            <input type="text" class="form-control" id="insDni" placeholder="Ej. 21400211" required value="21400211">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>DNI</label>
+                            <input type="text" id="insDni" placeholder="Ej. 21400211" required value="21400211" maxlength="8">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Nombres y Apellidos</label>
-                            <input type="text" class="form-control" id="insNombres" required value="Manuel Antonio Ramos Donayre">
+                        <div class="col-md-6">
+                            <label>Apellidos y Nombres</label>
+                            <input type="text" id="insNombres" required value="Ramos Donayre, Manuel Antonio">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Celular</label>
-                            <input type="text" class="form-control" id="insCelular" value="956 724 100">
+                        <div class="col-md-6">
+                            <label>Celular</label>
+                            <input type="text" id="insCelular" value="956724100">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Sede / Ubicación</label>
-                            <input type="text" class="form-control" id="insSede" value="Ica">
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <!-- Datos Académicos y de Pago -->
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label fw-bold">Diplomado / Curso</label>
-                            <select class="form-select" id="insCurso">
-                                <option value="Diplomado: Formulación y evaluación de estudios de pre inversión en salud">Diplomado: Formulación y evaluación de estudios de pre inversión en salud</option>
-                                <option value="Curso: Gestión de Impactos Ambientales">Curso: Gestión de Impactos Ambientales</option>
+                        <div class="col-md-6">
+                            <label>Sede / Ubicación</label>
+                            <select id="insSede">
+                                <option>Huancayo</option>
+                                <option>Ica</option>
+                                <option selected>Marcona</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Monto a Pagar (S/)</label>
-                            <input type="number" class="form-control" id="insMonto" value="270.00" required>
+                        
+                        <div class="col-12 mt-4 pt-3 border-top"></div>
+                        
+                        <div class="col-md-8">
+                            <label>Diplomado / Curso</label>
+                            <input type="text" id="insCurso" value="Diplomado: Formulación y evaluación de estudios de pre inversión en salud">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Monto a Pagar (S/)</label>
+                            <input type="number" id="insMonto" value="270.00" required>
                         </div>
                     </div>
                     
-                    <div class="text-end mt-3">
-                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #0b2e59;">Registrar y Generar Boleta</button>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn-custom btn-primary-custom w-100 w-md-auto">
+                            Guardar inscripción y emitir boleta
+                        </button>
                     </div>
                 </form>
             </div>
@@ -122,47 +202,53 @@
 
 
         <!-- ==========================================
-             MÓDULO 2: BOLETA DE PAGO
+             MÓDULO 2: BOLETA DE PAGO (TICKET TÉRMICO)
              ========================================== -->
         <div id="view-boleta" class="d-none">
-            <div class="text-center mb-4 no-print">
-                <button class="btn btn-outline-secondary" onclick="switchView('inscripcion')">← Nueva Inscripción</button>
-                <button class="btn btn-success" onclick="imprimirSeccion('view-boleta')">🖨️ Imprimir Ticket / Boleta</button>
+            
+            <div class="d-flex justify-content-between align-items-end mb-4 no-print">
+                <div>
+                    <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">boleta.php</p>
+                    <h2 style="color: var(--navy); margin:0;">Boleta de Pago</h2>
+                </div>
+                <div>
+                    <button class="btn-custom btn-ghost-custom me-2" onclick="switchView('inscripcion')">← Nueva</button>
+                    <button class="btn-custom btn-gold-custom" onclick="imprimirSeccion()">🖨️ Imprimir Ticket</button>
+                </div>
             </div>
 
-            <div class="module-card d-flex justify-content-center">
-                <div class="boleta-container shadow-sm">
-                    <div class="boleta-header">
-                        <h4 style="margin:0; font-weight:bold;">CORPORACIÓN DEL PERÚ</h4>
-                        <small>RUC: 20100227461</small><br>
-                        <small>Jr. Cuzco 310, Huancayo</small><br>
-                        <h5 style="margin-top:10px;">RECIBO ELECTRÓNICO</h5>
-                        <strong>N° B001 - 0008727</strong>
+            <div class="boleta-wrap">
+                <div class="ticket">
+                    <div class="t-center">
+                        <div class="t-org">CORPORACIÓN DEL PERÚ</div>
+                        <div class="t-sub">RUC: 20100227461<br>Jr. Cuzco 310, Huancayo</div>
+                        <div style="margin-top:8px; font-weight:bold;">RECIBO ELECTRÓNICO</div>
+                        <div style="font-size:10.5px; color:var(--muted);">N° B001 - <span id="bolNumero">0008727</span></div>
                     </div>
                     
-                    <div class="boleta-row">
-                        <span><strong>Fecha:</strong> <span id="bolFecha"></span></span>
-                        <span><strong>Hora:</strong> <span id="bolHora"></span></span>
-                    </div>
-                    <div class="boleta-row">
-                        <span><strong>DNI:</strong> <span id="bolDni">21400211</span></span>
-                    </div>
-                    <div class="boleta-row mb-3">
-                        <span><strong>Cliente:</strong> <span id="bolNombres">Manuel Antonio Ramos Donayre</span></span>
+                    <hr>
+                    
+                    <div class="t-row"><span>Fecha:</span><span id="bolFecha"></span></div>
+                    <div class="t-row"><span>Hora:</span><span id="bolHora"></span></div>
+                    <div class="t-row"><span>DNI:</span><span id="bolDni">21400211</span></div>
+                    <div class="t-row" style="flex-direction: column;">
+                        <span>Cliente:</span>
+                        <span id="bolNombres" style="text-align: left; color: var(--ink); font-weight: 600;">Ramos Donayre, Manuel Antonio</span>
                     </div>
                     
-                    <div style="border-bottom: 1px dashed #666; margin-bottom: 10px;"></div>
+                    <hr>
                     
-                    <div style="font-weight: bold; margin-bottom: 5px;">DESCRIPCIÓN:</div>
-                    <div style="font-size: 12px; margin-bottom: 10px;" id="bolCurso">
-                        Inscripción - Diplomado: Formulación y evaluación de estudios de pre inversión en salud
+                    <div class="t-row" style="flex-direction: column;">
+                        <span style="font-weight:600; color:var(--ink); margin-bottom: 3px;">DESCRIPCIÓN:</span>
+                        <span id="bolCurso" style="text-align: left;">Inscripción - Diplomado en Salud</span>
                     </div>
                     
-                    <div class="boleta-total">
-                        TOTAL: S/ <span id="bolTotal">270.00</span>
+                    <div class="t-total">
+                        <span>TOTAL:</span>
+                        <span>S/ <span id="bolTotal">270.00</span></span>
                     </div>
                     
-                    <div class="text-center mt-4" style="font-size: 11px;">
+                    <div class="t-foot">
                         *** GRACIAS POR SU PREFERENCIA ***<br>
                         Conserve este recibo para cualquier reclamo.<br>
                         corporaciondelperu.com
@@ -178,78 +264,81 @@
         <div id="view-certificado" class="d-none">
             
             <!-- Buscador -->
-            <div id="certBuscador" class="module-card no-print">
-                <h4 class="mb-3" style="color: #0b2e59;">Buscar Certificado para Impresión</h4>
-                <div class="row">
-                    <div class="col-md-9 mb-2">
-                        <input type="text" id="inputBuscarCert" class="form-control form-control-lg" placeholder="Ingrese DNI (Ej. 21400211)">
+            <div id="certBuscador" class="card no-print">
+                <h3 style="color: var(--navy); margin-bottom: 20px;">Buscar Certificado para Impresión</h3>
+                <div class="row g-2">
+                    <div class="col-md-9">
+                        <input type="text" id="inputBuscarCert" placeholder="Ingrese DNI (Ej. 21400211)" style="padding: 12px 15px; font-size: 15px;">
                     </div>
-                    <div class="col-md-3 mb-2">
-                        <button class="btn btn-primary btn-lg w-100" style="background-color: #0b2e59;" onclick="mostrarCertificado()">Buscar</button>
+                    <div class="col-md-3">
+                        <button class="btn-custom btn-primary-custom w-100 h-100" onclick="mostrarCertificado()">Buscar</button>
                     </div>
                 </div>
             </div>
 
             <!-- Vista del Certificado -->
             <div id="certPlantilla" class="d-none">
-                <div class="d-flex justify-content-between mb-3 no-print">
-                    <button class="btn btn-outline-secondary" onclick="ocultarCertificado()">← Buscar otro</button>
-                    <button class="btn btn-success" onclick="imprimirSeccion('view-certificado')">🖨️ Imprimir Certificado PDF</button>
+                
+                <div class="d-flex justify-content-between align-items-end mb-4 no-print">
+                    <div>
+                        <p class="font-mono" style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 4px;">certificado.php</p>
+                        <h2 style="color: var(--navy); margin:0;">Vista Previa del Diploma</h2>
+                    </div>
+                    <div>
+                        <button class="btn-custom btn-ghost-custom me-2" onclick="ocultarCertificado()">← Buscar otro</button>
+                        <button class="btn-custom btn-gold-custom" onclick="imprimirSeccion()">🖨️ Imprimir PDF</button>
+                    </div>
                 </div>
 
-                <div class="cert-container shadow-sm">
-                    <div class="cert-header">
-                        <h1>Corporación del Perú</h1>
-                        <h3>CERTIFICADO DE ESTUDIOS</h3>
-                        <p style="font-size: 13px; margin-top:5px;">La Dirección Académica de la entidad Educativa CORPORACIÓN DEL PERÚ certifica que:</p>
+                <div class="cert-wrap">
+                    <div class="cert-top">
+                        <div class="cert-mark"><span></span><span></span></div>
+                        <div class="cert-org">Corporación del Perú</div>
+                        <div class="cert-title">Certificado de Estudios</div>
+                        <p class="cert-lead">La Dirección Académica certifica que:</p>
                     </div>
 
-                    <div class="student-name">MANUEL ANTONIO RAMOS DONAYRE</div>
+                    <div class="cert-name">MANUEL ANTONIO RAMOS DONAYRE</div>
 
-                    <p class="text-center" style="font-size: 13px;">Ha concluido en forma satisfactoria sus estudios académicos correspondiente al:</p>
-
-                    <div class="course-name">
-                        DIPLOMADO: FORMULACIÓN Y EVALUACIÓN DE ESTUDIOS DE PRE INVERSIÓN<br>
-                        EN EL MARCO DEL SISTEMA NACIONAL DE INVERSIÓN PÚBLICA - SECTOR SALUD
+                    <div class="cert-body">
+                        Ha concluido en forma satisfactoria sus estudios académicos correspondientes al:<br><br>
+                        <b>DIPLOMADO: FORMULACIÓN Y EVALUACIÓN DE ESTUDIOS DE PRE INVERSIÓN EN EL MARCO DEL SISTEMA NACIONAL DE INVERSIÓN PÚBLICA - SECTOR SALUD</b><br><br>
+                        Cumpliendo con los requisitos de evaluación establecidos.
                     </div>
 
-                    <p style="font-size: 12px; text-align: center;">Cumpliendo con los requisitos de evaluación establecidos en el marco de capacitación.</p>
-
-                    <table class="grades-table">
+                    <table class="cert-grades">
                         <thead>
                             <tr>
                                 <th>TEMÁTICA CURRICULAR</th>
-                                <th style="width: 60px; text-align: center;">NOTA</th>
+                                <th>NOTA</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>NORMATIVIDAD DEL SISTEMA NACIONAL DE INVERSIÓN PÚBLICA</td><td class="text-center">17</td></tr>
-                            <tr><td>FORMULACIÓN DE LOS ESTUDIOS DE PRE INVERSIÓN EN SALUD</td><td class="text-center">16</td></tr>
-                            <tr><td>EVALUACIÓN DE ESTUDIOS DE PRE INVERSIÓN EN SALUD</td><td class="text-center">17</td></tr>
-                            <tr><td>ELABORACIÓN DE ESTUDIOS DE PRE INVERSIÓN A NIVEL DE PERFIL</td><td class="text-center">17</td></tr>
-                            <tr><td>APLICATIVOS INFORMÁTICOS PARA OFICINAS DE PROGRAMACIÓN DE INVERSIONES</td><td class="text-center">16</td></tr>
-                            <tr><td>GESTIÓN DE IMPACTOS AMBIENTALES Y SOCIALES</td><td class="text-center">17</td></tr>
-                            <tr><td>ANÁLISIS DE SOSTENIBILIDAD PRESUPUESTAL: COMPROMISOS OPERACIÓN Y MANTENIMIENTO</td><td class="text-center">17</td></tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th class="text-end">PROMEDIO FINAL</th>
-                                <th class="text-center fs-6">17</th>
+                            <tr><td>Normatividad del sistema nacional de inversión pública</td><td>17</td></tr>
+                            <tr><td>Formulación de los estudios de pre inversión en salud</td><td>16</td></tr>
+                            <tr><td>Evaluación de estudios de pre inversión en salud</td><td>17</td></tr>
+                            <tr><td>Elaboración de estudios de pre inversión a nivel de perfil</td><td>17</td></tr>
+                            <tr><td>Aplicativos informáticos para programación de inversiones</td><td>16</td></tr>
+                            <tr><td>Gestión de impactos ambientales y sociales</td><td>17</td></tr>
+                            <tr><td>Análisis de sostenibilidad presupuestal</td><td>17</td></tr>
+                            <tr class="avg">
+                                <td>PROMEDIO FINAL</td>
+                                <td>17</td>
                             </tr>
-                        </tfoot>
+                        </tbody>
                     </table>
 
-                    <div style="font-size: 11px; margin-top: 20px; color: #333;">
-                        <p>Realizado del: 09 de Junio al 09 de Agosto del 2025. Con una Duración de 02 meses con 240 Horas Lectivas.</p>
-                        <p>El presente Certificado de Estudios está Codificado en los registros de nuestra Institución.<br>Para su Verificación y Autenticidad, comuníquese al Cel. 964-487541.<br>Alumno Identificado con Documento de Identidad N° <strong>21400211</strong></p>
-                        
-                        <div class="mt-3 d-flex justify-content-between align-items-end">
-                            <div>
-                                <strong>C: 12-012-EN-26</strong><br>Registro N° 01<br><strong>C.A: R-359-26</strong>
-                            </div>
-                            <div class="text-end" style="font-size: 13px;">
-                                Huancayo, 09 de Agosto del 2025
-                            </div>
+                    <div class="cert-foot">
+                        <div>
+                            <strong>C: 12-012-EN-26</strong><br>
+                            Registro N° 01<br>
+                            <strong>C.A: R-359-26</strong><br>
+                            DNI N° 21400211
+                        </div>
+                        <div style="text-align: right;">
+                            Realizado del 09 de Junio al 09 de Agosto del 2025.<br>
+                            Duración: 02 meses (240 Horas Lectivas).<br>
+                            Huancayo, 09 de Agosto del 2025
                         </div>
                     </div>
                 </div>
@@ -260,7 +349,6 @@
 
     <!-- Scripts de interactividad -->
     <script>
-        // Función para cambiar de pestañas en el menú superior
         function switchView(viewName) {
             // Ocultar todos
             document.getElementById('view-inscripcion').classList.add('d-none');
@@ -277,41 +365,35 @@
 
             // Mostrar el seleccionado
             document.getElementById('view-' + viewName).classList.remove('d-none');
-            document.getElementById('view-' + viewName).classList.add('d-block', 'd-block-print'); // d-block-print asegura que solo este se imprima
+            document.getElementById('view-' + viewName).classList.add('d-block', 'd-block-print'); 
             document.getElementById('tab-' + viewName).classList.add('active');
         }
 
-        // Función que simula el proceso al darle "Registrar"
         function simularRegistro(event) {
-            event.preventDefault(); // Evita recargar
+            event.preventDefault(); 
             
-            // Capturar datos del formulario
             const dni = document.getElementById('insDni').value;
             const nombres = document.getElementById('insNombres').value;
             const curso = document.getElementById('insCurso').value;
             const monto = parseFloat(document.getElementById('insMonto').value).toFixed(2);
             
-            // Obtener fecha y hora actual
             const now = new Date();
             const fecha = now.toLocaleDateString('es-PE');
             const hora = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+            const boletaNum = Math.floor(Math.random() * 90000) + 10000;
 
-            // Llenar datos en la boleta
+            document.getElementById('bolNumero').innerText = "00" + boletaNum;
             document.getElementById('bolDni').innerText = dni;
             document.getElementById('bolNombres').innerText = nombres;
-            document.getElementById('bolCurso').innerText = "Inscripción - " + curso;
+            document.getElementById('bolCurso').innerText = "Inscripción:\n" + curso;
             document.getElementById('bolTotal').innerText = monto;
             document.getElementById('bolFecha').innerText = fecha;
             document.getElementById('bolHora').innerText = hora;
 
-            // Mostrar alerta de éxito
-            alert("✅ Alumno registrado correctamente en la Base de Datos.\nGenerando boleta de pago...");
-            
             // Cambiar a la vista de Boleta automáticamente
             switchView('boleta');
         }
 
-        // Lógica del buscador de certificado
         function mostrarCertificado() {
             const dni = document.getElementById('inputBuscarCert').value;
             if(dni === '21400211') {
@@ -328,9 +410,7 @@
             document.getElementById('inputBuscarCert').value = '';
         }
 
-        // Función personalizada para imprimir
-        function imprimirSeccion(sectionId) {
-            // La magia de CSS @media print + .d-block-print se encarga de aislar la vista
+        function imprimirSeccion() {
             window.print();
         }
     </script>
