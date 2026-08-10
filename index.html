@@ -654,6 +654,48 @@ async function hmacSHA256Hex(message, key){
   return Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,"0")).join("").toUpperCase();
 }
 
+/* ================= TOKEN AUTOCONTENIDO Y FIRMADO =================
+   GitHub Pages no tiene backend ni base de datos real: window.storage
+   solo existe dentro del entorno de Claude.ai, así que no sirve para
+   un sitio publicado de forma independiente. La solución sin servidor:
+   el propio link/QR lleva los datos del certificado codificados en
+   base64 + una firma HMAC-SHA256. La página de verificación NO
+   consulta ninguna base de datos — recalcula la firma con los datos
+   del link y la compara. Si coincide, es matemáticamente imposible
+   que el certificado haya sido alterado o inventado sin la clave.
+   =================================================================== */
+function b64urlEncode(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function b64urlDecode(str){
+  str = str.replace(/-/g,"+").replace(/_/g,"/");
+  while(str.length % 4) str += "=";
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function generarToken(payloadObj, key){
+  const payloadB64 = b64urlEncode(JSON.stringify(payloadObj));
+  const firma = await hmacSHA256Hex(payloadB64, key);
+  return `${payloadB64}.${firma.slice(0,16)}`;
+}
+async function verificarToken(token, key){
+  const partes = token.split(".");
+  if(partes.length !== 2) return { ok:false };
+  const [payloadB64, firma] = partes;
+  const firmaEsperada = (await hmacSHA256Hex(payloadB64, key)).slice(0,16);
+  if(firma.toUpperCase() !== firmaEsperada.toUpperCase()) return { ok:false };
+  try{
+    return { ok:true, data: JSON.parse(b64urlDecode(payloadB64)) };
+  } catch(e){
+    return { ok:false };
+  }
+}
+
 /* Router */
 const urls = {
   login: "sistema.corporaciondelperu.com/login.php",
@@ -1007,9 +1049,18 @@ async function emitirCertificado(correlativo){
 
   const fecha = new Date().toISOString().slice(0,10);
   const hash = await hmacSHA256Hex(`${r.correlativo}|${r.dni}|${alumno.nombre}|${prom}|${fecha}`, SECRET_KEY);
+
+  // Token autocontenido y firmado: lleva TODOS los datos que necesita
+  // mostrar la página de verificación pública, sin depender de ninguna
+  // base de datos. Esto es lo que realmente viaja en el link/QR.
+  const token = await generarToken({
+    c: r.correlativo, dni: r.dni, n: alumno.nombre,
+    curso: r.curso, horas: r.horas, fecha
+  }, SECRET_KEY);
+
   // El promedio se guarda internamente (uso interno / futuras validaciones),
   // pero en el certificado impreso se muestran las horas lectivas, no el promedio.
-  r.certificado = { codigoVerif: hash.slice(0,12), promedio: prom, fechaEmision: fecha };
+  r.certificado = { codigoVerif: hash.slice(0,12), token, promedio: prom, fechaEmision: fecha };
   await guardarDB();
   
   renderCertificadoVista(r);
@@ -1048,7 +1099,7 @@ function renderCertificadoVista(r){
         <div class="cert-qr">
           <div id="qrcode"></div>
           <div class="code">${r.certificado.codigoVerif}</div>
-          <div class="code" style="opacity:.7;">${linkVerificacion(r.certificado.codigoVerif)}</div>
+          <div class="code" style="opacity:.7;">${linkVerificacion(r.certificado.token)}</div>
         </div>
       </div>
     </div>
@@ -1059,16 +1110,52 @@ function renderCertificadoVista(r){
 
   document.getElementById("qrcode").innerHTML = "";
   new QRCode(document.getElementById("qrcode"), {
-    text: linkVerificacion(r.certificado.codigoVerif),
+    text: linkVerificacion(r.certificado.token),
     width: 64, height: 64
   });
 }
 
-/* VERIFICACIÓN PÚBLICA */
-function verificarCodigo(codigoCrudo){
-  const query = codigoCrudo.trim().toUpperCase();
+/* VERIFICACIÓN PÚBLICA — primero intenta el token autofirmado (no
+   necesita ninguna base de datos, funciona en cualquier hosting
+   estático); si lo que pegaron es un código corto o correlativo,
+   cae al lookup en memoria (solo útil dentro de la misma sesión
+   del panel interno, para pruebas). */
+async function verificarCodigo(entradaCruda){
+  const entrada = entradaCruda.trim();
   const resDiv = document.getElementById("verify-result");
 
+  // ¿Es una URL completa? Si es así, nos quedamos solo con el token (última parte de la ruta)
+  let posibleToken = entrada;
+  try{
+    if(entrada.includes("://")){
+      const u = new URL(entrada);
+      posibleToken = u.pathname.replace(BASE_PATH,"").replace(/^\/|\/$/g,"") || u.searchParams.get("code") || entrada;
+    }
+  } catch(e){ /* no era una URL válida, seguimos con el texto tal cual */ }
+
+  if(posibleToken.includes(".")){
+    const resultado = await verificarToken(posibleToken, SECRET_KEY);
+    if(resultado.ok){
+      const d = resultado.data;
+      resDiv.className = "verify-result show ok";
+      resDiv.innerHTML = `
+        <div class="verify-head"><div class="verify-icon">✓</div><h4>Certificado Auténtico y Válido</h4></div>
+        <div class="verify-detail">
+          <div><dt>Alumno:</dt><dd>${d.n}</dd></div>
+          <div><dt>DNI:</dt><dd>${d.dni}</dd></div>
+          <div><dt>Curso:</dt><dd>${d.curso}</dd></div>
+          <div><dt>Horas lectivas:</dt><dd>${d.horas}</dd></div>
+          <div><dt>Correlativo:</dt><dd>${d.c}</dd></div>
+          <div><dt>Emitido:</dt><dd>${d.fecha}</dd></div>
+        </div>
+        <p style="font-size:11.5px;color:var(--success);margin:14px 0 0;font-family:'JetBrains Mono',monospace;">✓ Firma HMAC-SHA256 verificada — dato autocontenido, no depende de ninguna base de datos.</p>
+      `;
+      return;
+    }
+  }
+
+  // Respaldo: búsqueda por código corto / correlativo dentro de la sesión actual
+  const query = entrada.toUpperCase();
   const match = DB.inscripciones.find(x => x.certificado && (x.certificado.codigoVerif.toUpperCase() === query || x.correlativo.toUpperCase() === query));
 
   if(match){
@@ -1088,7 +1175,7 @@ function verificarCodigo(codigoCrudo){
     resDiv.className = "verify-result show bad";
     resDiv.innerHTML = `
       <div class="verify-head"><div class="verify-icon">✕</div><h4>Documento No Encontrado</h4></div>
-      <p style="font-size:13.5px;margin:0;">El código ingresado no coincide con ningún certificado emitido en nuestros registros.</p>
+      <p style="font-size:13.5px;margin:0;">El código ingresado no coincide con ningún certificado emitido, o la firma no es válida.</p>
     `;
   }
 }
