@@ -285,6 +285,19 @@
   .ticket .t-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; color: var(--laravel-red); margin-top: 10px; }
   .ticket .t-foot { text-align: center; font-size: 10px; color: var(--zinc-500); margin-top: 18px; line-height: 1.6; }
 
+  /* ---------- REPORTES ---------- */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  @media (max-width: 820px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-card { background: #FFF; border: 1px solid var(--zinc-200); border-radius: 12px; padding: 16px 18px; }
+  .kpi-card .kpi-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--zinc-500); margin-bottom: 6px; }
+  .kpi-card .kpi-value { font-size: 22px; font-weight: 700; color: var(--zinc-900); }
+  .rep-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .rep-tab.active { background: var(--laravel-red-soft); color: var(--laravel-red); border-color: transparent; font-weight: 600; }
+  .filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 18px; }
+  .filter-row .field { margin-bottom: 0; min-width: 170px; flex: 1; }
+  .rep-foot { display: flex; justify-content: flex-end; gap: 24px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; border-top: 1px solid var(--zinc-200); }
+  .rep-foot b { color: var(--zinc-900); }
+
   @media print {
     body * { visibility: hidden; }
     .ticket, .ticket *, .cert-wrap, .cert-wrap * { visibility: visible; }
@@ -335,6 +348,7 @@
       <button class="nav-btn" data-page="alumnonuevo">🧑 Nuevo alumno</button>
       <button class="nav-btn" data-page="matricula">➕ Matricular curso</button>
       <button class="nav-btn" data-page="cursos">📚 Mantenedor de Cursos</button>
+      <button class="nav-btn" data-page="reportes">📊 Reportes</button>
     </nav>
     <button class="logout-btn" id="btn-logout">Cerrar sesión</button>
   </aside>
@@ -440,6 +454,64 @@
           <thead><tr><th>Código</th><th>Curso / Diplomado</th><th>Horas</th><th>Costo</th><th>Módulos</th></tr></thead>
           <tbody id="tbl-cursos"></tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- PAGE: reportes.php -->
+    <section class="page" id="page-reportes">
+      <div class="page-head">
+        <div><p class="page-eyebrow">reportes.php</p><h2>Reportes</h2><p>Alumnos, matrículas y ventas — con filtros y exportación a Excel (CSV).</p></div>
+      </div>
+
+      <div class="kpi-grid" id="kpi-cards"></div>
+
+      <div class="rep-tabs">
+        <button class="btn btn-ghost rep-tab active" data-rep="alumnos">Alumnos</button>
+        <button class="btn btn-ghost rep-tab" data-rep="matriculas">Matrículas</button>
+        <button class="btn btn-ghost rep-tab" data-rep="ventas">Ventas</button>
+      </div>
+
+      <!-- Reporte: Alumnos -->
+      <div class="rep-view" id="rep-alumnos">
+        <div class="card">
+          <div class="filter-row">
+            <div class="field"><label>Buscar (nombre o DNI)</label><input id="rep-al-busca" placeholder="Ej. Ramos o 21400211" oninput="renderRepAlumnos()"></div>
+            <div class="field"><label>Sede</label><select id="rep-al-sede" onchange="renderRepAlumnos()"><option value="">Todas</option><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+            <div class="field"><label>Estado civil</label><select id="rep-al-estado" onchange="renderRepAlumnos()"><option value="">Todos</option><option>No especificado</option><option>Soltero(a)</option><option>Casado(a)</option><option>Conviviente</option><option>Divorciado(a)</option><option>Viudo(a)</option></select></div>
+            <button class="btn btn-ghost" onclick="exportarRepAlumnos()">⬇ Exportar Excel (CSV)</button>
+          </div>
+          <table><thead><tr><th>DNI</th><th>Nombre</th><th>Celular</th><th>Correo</th><th>Sede</th><th>N° Cursos</th></tr></thead><tbody id="tbl-rep-alumnos"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Reporte: Matrículas -->
+      <div class="rep-view" id="rep-matriculas" style="display:none;">
+        <div class="card">
+          <div class="filter-row">
+            <div class="field"><label>Curso</label><select id="rep-ma-curso" onchange="renderRepMatriculas()"><option value="">Todos</option></select></div>
+            <div class="field"><label>Sede</label><select id="rep-ma-sede" onchange="renderRepMatriculas()"><option value="">Todas</option><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+            <div class="field"><label>Estado</label><select id="rep-ma-estado" onchange="renderRepMatriculas()"><option value="">Todos</option><option value="pendiente">Pendiente de notas</option><option value="completas">Notas completas</option><option value="certificado">Certificado emitido</option></select></div>
+            <div class="field"><label>Desde</label><input type="date" id="rep-ma-desde" onchange="renderRepMatriculas()"></div>
+            <div class="field"><label>Hasta</label><input type="date" id="rep-ma-hasta" onchange="renderRepMatriculas()"></div>
+            <button class="btn btn-ghost" onclick="exportarRepMatriculas()">⬇ Exportar Excel (CSV)</button>
+          </div>
+          <table><thead><tr><th>Correlativo</th><th>Alumno</th><th>Curso</th><th>Modalidad</th><th>Sede</th><th>Fecha inicio</th><th>Horas</th><th>Pago</th><th>Certificado</th></tr></thead><tbody id="tbl-rep-matriculas"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Reporte: Ventas -->
+      <div class="rep-view" id="rep-ventas" style="display:none;">
+        <div class="card">
+          <div class="filter-row">
+            <div class="field"><label>Forma de pago</label><select id="rep-ve-forma" onchange="renderRepVentas()"><option value="">Todas</option><option>Efectivo</option><option>Yape</option><option>Transferencia BCP</option><option>Transferencia Banco de la Nación</option></select></div>
+            <div class="field"><label>Sede</label><select id="rep-ve-sede" onchange="renderRepVentas()"><option value="">Todas</option><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+            <div class="field"><label>Desde</label><input type="date" id="rep-ve-desde" onchange="renderRepVentas()"></div>
+            <div class="field"><label>Hasta</label><input type="date" id="rep-ve-hasta" onchange="renderRepVentas()"></div>
+            <button class="btn btn-ghost" onclick="exportarRepVentas()">⬇ Exportar Excel (CSV)</button>
+          </div>
+          <table><thead><tr><th>Boleta</th><th>Fecha</th><th>Alumno</th><th>Curso</th><th>Tipo</th><th>Forma de pago</th><th>Monto</th></tr></thead><tbody id="tbl-rep-ventas"></tbody></table>
+          <div class="rep-foot" id="rep-ventas-totales"></div>
+        </div>
       </div>
     </section>
 
@@ -703,13 +775,14 @@ const urls = {
   alumnonuevo: "sistema.corporaciondelperu.com/alumno-nuevo.php",
   matricula: "sistema.corporaciondelperu.com/matricula.php",
   cursos: "sistema.corporaciondelperu.com/cursos.php",
+  reportes: "sistema.corporaciondelperu.com/reportes.php",
   boleta: "sistema.corporaciondelperu.com/boleta.php?id=",
   alumno: "sistema.corporaciondelperu.com/alumno.php?id=",
   verificar: "verifica.corporaciondelperu.com/"
 };
 
 let currentAlumnoId = null;
-const INTERNAL_PAGES = ["dashboard","alumnonuevo","matricula","cursos","boleta","alumno"];
+const INTERNAL_PAGES = ["dashboard","alumnonuevo","matricula","cursos","reportes","boleta","alumno"];
 
 function goto(page, opts){
   document.getElementById("page-login").style.display = page==="login" ? "block":"none";
@@ -726,6 +799,7 @@ function goto(page, opts){
   
   if(page==="dashboard") renderDashboard();
   if(page==="cursos") renderCursos();
+  if(page==="reportes") renderReportes();
   if(page==="boleta") renderBoleta(opts.id);
   if(page==="alumno") { currentAlumnoId = opts.id; renderAlumno(opts.id); }
   if(page==="alumnonuevo") renderAlumnoNuevoForm();
@@ -1185,6 +1259,179 @@ document.getElementById("btn-verificar").addEventListener("click", () => {
 document.getElementById("verify-input").addEventListener("keydown", (e) => {
   if(e.key === "Enter") verificarCodigo(document.getElementById("verify-input").value);
 });
+
+/* ================= REPORTES ================= */
+function parsePeDate(str){
+  if(!str || str==="—") return null;
+  const partes = str.split("/");
+  if(partes.length !== 3) return null;
+  const [d,m,y] = partes.map(Number);
+  return new Date(y, m-1, d);
+}
+function enRango(fecha, desdeStr, hastaStr){
+  if(!fecha) return !desdeStr && !hastaStr;
+  if(desdeStr && fecha < new Date(desdeStr)) return false;
+  if(hastaStr && fecha > new Date(hastaStr+"T23:59:59")) return false;
+  return true;
+}
+function csvEscape(v){
+  const s = String(v ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+}
+function descargarCSV(nombreArchivo, headers, filas){
+  const contenido = [headers.join(","), ...filas.map(f=>f.map(csvEscape).join(","))].join("\n");
+  const blob = new Blob(["\uFEFF"+contenido], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nombreArchivo;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.querySelectorAll(".rep-tab").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".rep-tab").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".rep-view").forEach(v=>v.style.display="none");
+    document.getElementById("rep-"+btn.dataset.rep).style.display="block";
+  });
+});
+
+function renderReportes(){
+  renderKPIs();
+  poblarSelectCursosReporte();
+  renderRepAlumnos();
+  renderRepMatriculas();
+  renderRepVentas();
+}
+
+function renderKPIs(){
+  const totalAlumnos = DB.alumnos.length;
+  const matriculasActivas = DB.inscripciones.filter(x=>!x.certificado).length;
+  const now = new Date();
+  const ingresosMes = DB.inscripciones.flatMap(r=>r.pagos).filter(p=>{
+    const d = parsePeDate(p.fecha);
+    return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).reduce((a,p)=>a+p.monto,0);
+  const certificadosEmitidos = DB.inscripciones.filter(x=>x.certificado).length;
+
+  document.getElementById("kpi-cards").innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Alumnos registrados</div><div class="kpi-value">${totalAlumnos}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Matrículas activas</div><div class="kpi-value">${matriculasActivas}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ingresos del mes</div><div class="kpi-value">S/ ${ingresosMes.toFixed(2)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Certificados emitidos</div><div class="kpi-value">${certificadosEmitidos}</div></div>
+  `;
+}
+
+function poblarSelectCursosReporte(){
+  const sel = document.getElementById("rep-ma-curso");
+  const actual = sel.value;
+  sel.innerHTML = `<option value="">Todos</option>` + DB.cursos.map(c=>`<option value="${c.nombre}">${c.nombre}</option>`).join("");
+  sel.value = actual;
+}
+
+/* --- Reporte: Alumnos --- */
+function filasRepAlumnos(){
+  const busca = document.getElementById("rep-al-busca").value.trim().toLowerCase();
+  const sede = document.getElementById("rep-al-sede").value;
+  const estado = document.getElementById("rep-al-estado").value;
+  return DB.alumnos.filter(a => {
+    if(sede && a.sede !== sede) return false;
+    if(estado && a.estadoCivil !== estado) return false;
+    if(busca && !(a.nombre.toLowerCase().includes(busca) || a.dni.includes(busca))) return false;
+    return true;
+  });
+}
+function renderRepAlumnos(){
+  const lista = filasRepAlumnos();
+  document.getElementById("tbl-rep-alumnos").innerHTML = lista.length ? lista.map(a=>{
+    const nCursos = DB.inscripciones.filter(x=>x.dni===a.dni).length;
+    return `<tr><td>${a.dni}</td><td><b>${a.nombre}</b></td><td>${a.celular||"—"}</td><td>${a.correo||"—"}</td><td>${a.sede}</td><td>${nCursos}</td></tr>`;
+  }).join("") : `<tr><td colspan="6" style="text-align:center;color:var(--zinc-500);">Sin resultados para estos filtros.</td></tr>`;
+}
+function exportarRepAlumnos(){
+  const lista = filasRepAlumnos();
+  descargarCSV("reporte-alumnos.csv", ["DNI","Nombre","Celular","Correo","Sede","N Cursos"],
+    lista.map(a=>[a.dni, a.nombre, a.celular, a.correo, a.sede, DB.inscripciones.filter(x=>x.dni===a.dni).length]));
+}
+
+/* --- Reporte: Matrículas --- */
+function estadoMatricula(r){
+  if(r.certificado) return "certificado";
+  return r.temas.every(t=>t.nota!=="" && t.nota!==null) ? "completas" : "pendiente";
+}
+function filasRepMatriculas(){
+  const curso = document.getElementById("rep-ma-curso").value;
+  const sede = document.getElementById("rep-ma-sede").value;
+  const estado = document.getElementById("rep-ma-estado").value;
+  const desde = document.getElementById("rep-ma-desde").value;
+  const hasta = document.getElementById("rep-ma-hasta").value;
+  return DB.inscripciones.filter(r => {
+    const alumno = getAlumno(r.dni);
+    if(curso && r.curso !== curso) return false;
+    if(sede && alumno?.sede !== sede) return false;
+    if(estado && estadoMatricula(r) !== estado) return false;
+    if(!enRango(parsePeDate(r.fechaInicio), desde, hasta)) return false;
+    return true;
+  });
+}
+function renderRepMatriculas(){
+  const lista = filasRepMatriculas();
+  const estadoLabel = { pendiente:"Pendiente de notas", completas:"Notas completas", certificado:"Certificado emitido" };
+  document.getElementById("tbl-rep-matriculas").innerHTML = lista.length ? lista.map(r=>{
+    const alumno = getAlumno(r.dni) || {};
+    const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
+    const pagoLabel = (r.monto - pagado) <= 0 ? `<span class="pill pill-ok">Pagado</span>` : `<span class="pill pill-pend">Debe S/ ${(r.monto-pagado).toFixed(2)}</span>`;
+    const est = estadoMatricula(r);
+    const estPill = est==="certificado" ? `<span class="pill pill-cert">Certificado</span>` : est==="completas" ? `<span class="pill pill-ok">Notas completas</span>` : `<span class="pill pill-pend">Pendiente</span>`;
+    return `<tr><td style="font-family:'JetBrains Mono';">${r.correlativo}</td><td><b>${alumno.nombre||"—"}</b></td><td style="max-width:220px;">${r.curso}</td><td>${r.modalidad}</td><td>${alumno.sede||"—"}</td><td>${r.fechaInicio}</td><td>${r.horas}</td><td>${pagoLabel}</td><td>${estPill}</td></tr>`;
+  }).join("") : `<tr><td colspan="9" style="text-align:center;color:var(--zinc-500);">Sin resultados para estos filtros.</td></tr>`;
+}
+function exportarRepMatriculas(){
+  const lista = filasRepMatriculas();
+  descargarCSV("reporte-matriculas.csv", ["Correlativo","Alumno","DNI","Curso","Modalidad","Sede","Fecha inicio","Horas","Estado pago","Estado"],
+    lista.map(r=>{
+      const alumno = getAlumno(r.dni)||{};
+      const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
+      return [r.correlativo, alumno.nombre, r.dni, r.curso, r.modalidad, alumno.sede, r.fechaInicio, r.horas, (r.monto-pagado)<=0?"Pagado":`Debe ${(r.monto-pagado).toFixed(2)}`, estadoMatricula(r)];
+    }));
+}
+
+/* --- Reporte: Ventas --- */
+function filasRepVentas(){
+  const forma = document.getElementById("rep-ve-forma").value;
+  const sede = document.getElementById("rep-ve-sede").value;
+  const desde = document.getElementById("rep-ve-desde").value;
+  const hasta = document.getElementById("rep-ve-hasta").value;
+  const filas = [];
+  DB.inscripciones.forEach(r => {
+    const alumno = getAlumno(r.dni) || {};
+    r.pagos.forEach(p => {
+      if(forma && p.formaPago !== forma) return;
+      if(sede && alumno.sede !== sede) return;
+      if(!enRango(parsePeDate(p.fecha), desde, hasta)) return;
+      filas.push({ ...p, alumno: alumno.nombre||"—", curso: r.curso });
+    });
+  });
+  return filas;
+}
+function renderRepVentas(){
+  const filas = filasRepVentas();
+  document.getElementById("tbl-rep-ventas").innerHTML = filas.length ? filas.map(p=>`
+    <tr><td style="font-family:'JetBrains Mono';">${p.serie}-${p.numero}</td><td>${p.fecha} ${p.hora}</td><td><b>${p.alumno}</b></td><td style="max-width:220px;">${p.curso}</td><td>${p.tipo}</td><td>${p.formaPago}</td><td style="text-align:right;font-family:'JetBrains Mono';">S/ ${p.monto.toFixed(2)}</td></tr>
+  `).join("") : `<tr><td colspan="7" style="text-align:center;color:var(--zinc-500);">Sin resultados para estos filtros.</td></tr>`;
+
+  const totalCobrado = filas.reduce((a,p)=>a+p.monto,0);
+  document.getElementById("rep-ventas-totales").innerHTML = `
+    <span>Transacciones: <b>${filas.length}</b></span>
+    <span>Total cobrado: <b>S/ ${totalCobrado.toFixed(2)}</b></span>
+  `;
+}
+function exportarRepVentas(){
+  const filas = filasRepVentas();
+  descargarCSV("reporte-ventas.csv", ["Boleta","Fecha","Hora","Alumno","Curso","Tipo","Forma de pago","Monto"],
+    filas.map(p=>[`${p.serie}-${p.numero}`, p.fecha, p.hora, p.alumno, p.curso, p.tipo, p.formaPago, p.monto.toFixed(2)]));
+}
 
 // Inicialización — carga la BD compartida antes de mostrar cualquier página
 (async () => {
