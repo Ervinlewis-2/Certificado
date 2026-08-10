@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Redirigiendo…</title>
+<script>
+  /* GitHub Pages no tiene servidor: cuando alguien entra directo a
+     /Certificado/2E1973E3993E (por ejemplo, escaneando el QR),
+     GitHub busca ese archivo/carpeta, no lo encuentra, y sirve este
+     404.html. Aquí codificamos la ruta original en un query string
+     y mandamos al usuario a index.html, que la vuelve a montar
+     (ver restaurarRutaDesde404 en el <script> principal) antes de
+     que la app arranque — así el usuario nunca ve el 404 y el
+     código de verificación no se pierde. */
+  var rutaOriginal = location.pathname + location.search + location.hash;
+  location.replace(location.origin + "/Certificado/?p=" + encodeURIComponent(rutaOriginal));
+</script>
+</head>
+<body>
+  <p style="font-family:sans-serif;color:#71717A;">Redirigiendo…</p>
+</body>
+</html>
