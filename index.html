@@ -332,7 +332,8 @@
     <div class="who"><b>Sr. Juan Quispe A.</b>Asesor académico · Sede Huancayo</div>
     <nav>
       <button class="nav-btn active" data-page="dashboard">📋 Alumnos inscritos</button>
-      <button class="nav-btn" data-page="inscripcion">➕ Nueva inscripción</button>
+      <button class="nav-btn" data-page="alumnonuevo">🧑 Nuevo alumno</button>
+      <button class="nav-btn" data-page="matricula">➕ Matricular curso</button>
       <button class="nav-btn" data-page="cursos">📚 Mantenedor de Cursos</button>
     </nav>
     <button class="logout-btn" id="btn-logout">Cerrar sesión</button>
@@ -343,7 +344,7 @@
     <section class="page active" id="page-dashboard">
       <div class="page-head">
         <div><h2>Alumnos inscritos</h2><p>Listado general. Selecciona un alumno para registrar notas o emitir su certificado.</p></div>
-        <button class="btn btn-red" id="btn-ir-inscripcion">+ Nueva inscripción</button>
+        <button class="btn btn-red" id="btn-ir-inscripcion">+ Matricular alumno</button>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
         <table>
@@ -353,21 +354,48 @@
       </div>
     </section>
 
-    <!-- PAGE: inscripcion.php -->
-    <section class="page" id="page-inscripcion">
+    <!-- PAGE: alumno-nuevo.php -->
+    <section class="page" id="page-alumnonuevo">
       <button class="back-link" data-back="dashboard">← Volver al listado</button>
       <div class="page-head">
-        <div><h2 id="inscripcion-titulo">Nueva inscripción</h2><p>Registra el ingreso del alumno y autogenera su comprobante de pago.</p></div>
+        <div><p class="page-eyebrow">alumno-nuevo.php</p><h2>Registrar nuevo alumno</h2><p>Datos personales del alumno. Esto se registra una sola vez; luego puedes matricularlo en uno o varios cursos sin volver a escribir sus datos.</p></div>
       </div>
-      <div class="notice" id="alumno-existente-aviso" style="display:none;">
-        <span>ⓘ</span><span>Este DNI ya está registrado — se conservarán sus datos de cliente y se creará una nueva matrícula.</span>
+      <div class="notice" id="dni-existente-aviso" style="display:none;">
+        <span>ⓘ</span><span>Ya existe un alumno con este DNI. Ve a "Matricular curso" para inscribirlo en un nuevo curso sin duplicarlo.</span>
       </div>
       <div class="card">
         <div class="grid2">
-          <div class="field"><label>Apellidos y nombres</label><input id="f-nombre" placeholder="Ej. Ramos Donayre, Manuel Antonio"></div>
-          <div class="field"><label>DNI</label><input id="f-dni" placeholder="21400211" maxlength="8"></div>
-          <div class="field"><label>Celular</label><input id="f-cel" placeholder="956724100"></div>
-          <div class="field"><label>Sede</label><select id="f-sede"><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+          <div class="field"><label>Apellidos y nombres</label><input id="a-nombre" placeholder="Ej. Ramos Donayre, Manuel Antonio"></div>
+          <div class="field"><label>DNI</label><input id="a-dni" placeholder="21400211" maxlength="8"></div>
+          <div class="field"><label>Celular</label><input id="a-cel" placeholder="956724100"></div>
+          <div class="field"><label>Correo electrónico</label><input id="a-correo" type="email" placeholder="alumno@correo.com"></div>
+          <div class="field" style="grid-column:1/-1;"><label>Dirección</label><input id="a-direccion" placeholder="Calle / Jr. / Av., referencia, distrito"></div>
+          <div class="field"><label>Estado civil</label>
+            <select id="a-estado-civil"><option>No especificado</option><option>Soltero(a)</option><option>Casado(a)</option><option>Conviviente</option><option>Divorciado(a)</option><option>Viudo(a)</option></select>
+          </div>
+          <div class="field"><label>Ocupación</label><input id="a-ocupacion" placeholder="Ej. Ing. Mecánico"></div>
+          <div class="field"><label>Sede</label><select id="a-sede"><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-red" id="btn-guardar-alumno">Guardar alumno y matricular curso →</button>
+          <button class="btn btn-ghost" id="btn-guardar-alumno-solo">Guardar solo el alumno</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: matricula.php -->
+    <section class="page" id="page-matricula">
+      <button class="back-link" data-back="dashboard">← Volver al listado</button>
+      <div class="page-head">
+        <div><p class="page-eyebrow">matricula.php</p><h2 id="matricula-titulo">Matricular curso</h2><p>Selecciona un alumno ya registrado y el curso del catálogo. Genera correlativo y boleta automáticamente.</p></div>
+      </div>
+      <div class="notice" id="sin-alumnos-aviso" style="display:none;">
+        <span>ⓘ</span><span>Aún no hay alumnos registrados. <a style="color:var(--laravel-red);font-weight:600;cursor:pointer;" id="link-ir-alumno-nuevo">Registra uno primero →</a></span>
+      </div>
+      <div class="card">
+        <div class="grid2">
+          <div class="field" style="grid-column:1/-1;"><label>Alumno</label><select id="m-alumno" onchange="onCambioAlumno()"></select></div>
+          <div class="field"><label>Sede de esta matrícula</label><select id="m-sede"><option>Huancayo</option><option>Ica</option><option>Marcona</option></select></div>
           <div class="field" style="grid-column:1/-1;">
             <label>Curso / Diplomado (Selecciona del Mantenedor)</label>
             <select id="f-curso" onchange="actualizarPrecioCurso()"></select>
@@ -382,7 +410,7 @@
         <p style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--zinc-900);margin:4px 0 20px;">
           Saldo pendiente tras este pago: <b id="saldo-preview" style="color:var(--laravel-red);">S/ 0.00</b>
         </p>
-        <button class="btn btn-red" id="btn-inscribir">Guardar inscripción y emitir boleta</button>
+        <button class="btn btn-red" id="btn-inscribir">Matricular y emitir boleta</button>
       </div>
     </section>
 
@@ -420,6 +448,11 @@
       <button class="back-link" data-back="dashboard">← Volver al listado</button>
       <div class="page-head">
         <div><p class="page-eyebrow" id="alumno-eyebrow">alumno.php?id=</p><h2 id="alumno-nombre">—</h2><p id="alumno-curso"></p></div>
+      </div>
+
+      <div class="card">
+        <h3>Datos del alumno</h3>
+        <div id="datos-alumno-wrap"></div>
       </div>
 
       <div class="card">
@@ -473,10 +506,42 @@
 </div>
 
 <script>
+/* ================= RUTAS BONITAS EN GITHUB PAGES =================
+   GitHub Pages es hosting estático: no existe realmente la "carpeta"
+   /Certificado/2E1973E3993E, así que por defecto devuelve 404.
+   El archivo 404.html (ver más abajo) redirige aquí codificando la
+   ruta original en un query string; este bloque la restaura ANTES
+   de que corra el resto de la app, para que location.pathname vuelva
+   a ser /Certificado/2E1973E3993E tal como espera el usuario.
+   =================================================================== */
+(function restaurarRutaDesde404(){
+  const params = new URLSearchParams(location.search);
+  const rutaOriginal = params.get("p");
+  if(rutaOriginal){
+    history.replaceState(null, "", decodeURIComponent(rutaOriginal));
+  }
+})();
+
+/* Nombre del repositorio en GitHub Pages: username.github.io/Certificado/…
+   Si el repo tiene otro nombre, cambia solo esta constante. */
+const BASE_PATH = "/Certificado";
+
+function linkVerificacion(codigo){
+  return `${location.origin}${BASE_PATH}/${codigo}`;
+}
+function getCodigoDesdeURL(){
+  let path = location.pathname;
+  if(path.startsWith(BASE_PATH)) path = path.slice(BASE_PATH.length);
+  path = path.replace(/^\/|\/$/g, "");
+  if(path) return decodeURIComponent(path);
+  // compatibilidad con el formato anterior ?code=XXXX
+  return new URLSearchParams(location.search).get("code");
+}
+
 const SECRET_KEY = "corporacion-del-peru-demo-secret-2026";
 const AUTH = { user: "asesor", pass: "cdp2026" };
 
-/* BD Simulada */
+/* BD Simulada (valores por defecto — se sobreescriben con lo guardado en storage) */
 const DB = {
   seq: 359,
   boletaSeq: 122,
@@ -509,16 +574,27 @@ const DB = {
       ]
     }
   ],
+  alumnos: [],
   inscripciones: []
 };
 
-// Cargar registro inicial
+// Alumno de ejemplo (datos personales — separados de la matrícula)
+DB.alumnos.push({
+  dni: "21400211",
+  nombre: "Ramos Donayre, Manuel Antonio",
+  celular: "956724100",
+  correo: "",
+  direccion: "Calle Sta Rita Mz. IV Lot. 493, Urb. Sta María — Ica",
+  estadoCivil: "No especificado",
+  ocupacion: "Ing. Mecánico",
+  sede: "Marcona"
+});
+function getAlumno(dni){ return DB.alumnos.find(a => a.dni === dni); }
+
+// Matrícula inicial de ejemplo
 DB.inscripciones.push({
   correlativo: "R-359-26",
-  nombre: "Ramos Donayre, Manuel Antonio",
   dni: "21400211",
-  celular: "956724100",
-  sede: "Marcona",
   curso: DB.cursos[0].nombre,
   modalidad: "Distancia (D)",
   monto: 270,
@@ -533,6 +609,37 @@ DB.inscripciones.push({
   ],
   ultimaBoleta: null
 });
+
+/* ================= PERSISTENCIA (window.storage) =================
+   Sin esto, cada pestaña/dispositivo tenía su propia copia de la
+   "base de datos" en memoria, por eso el link público no encontraba
+   los certificados generados en otra sesión. Guardamos TODO el DB
+   bajo una sola llave compartida, así cualquiera que abra este mismo
+   demo ve los mismos alumnos, pagos y certificados.
+   =================================================================== */
+const DB_KEY = "cdp-demo-db-v1";
+
+async function cargarDB(){
+  try{
+    const res = await window.storage.get(DB_KEY, true); // shared:true
+    if(res && res.value){
+      const guardado = JSON.parse(res.value);
+      Object.assign(DB, guardado);
+    } else {
+      await guardarDB();
+    }
+  } catch(e){
+    // primera vez que se abre el demo: no existe la llave aún
+    await guardarDB();
+  }
+}
+async function guardarDB(){
+  try{
+    await window.storage.set(DB_KEY, JSON.stringify(DB), true); // shared:true
+  } catch(e){
+    console.error("No se pudo guardar en storage:", e);
+  }
+}
 
 function promedio(temas){ 
   const valids = temas.filter(t => t.nota !== "" && !isNaN(t.nota));
@@ -551,7 +658,8 @@ async function hmacSHA256Hex(message, key){
 const urls = {
   login: "sistema.corporaciondelperu.com/login.php",
   dashboard: "sistema.corporaciondelperu.com/dashboard.php",
-  inscripcion: "sistema.corporaciondelperu.com/inscripcion.php",
+  alumnonuevo: "sistema.corporaciondelperu.com/alumno-nuevo.php",
+  matricula: "sistema.corporaciondelperu.com/matricula.php",
   cursos: "sistema.corporaciondelperu.com/cursos.php",
   boleta: "sistema.corporaciondelperu.com/boleta.php?id=",
   alumno: "sistema.corporaciondelperu.com/alumno.php?id=",
@@ -559,7 +667,7 @@ const urls = {
 };
 
 let currentAlumnoId = null;
-const INTERNAL_PAGES = ["dashboard","inscripcion","cursos","boleta","alumno"];
+const INTERNAL_PAGES = ["dashboard","alumnonuevo","matricula","cursos","boleta","alumno"];
 
 function goto(page, opts){
   document.getElementById("page-login").style.display = page==="login" ? "block":"none";
@@ -578,14 +686,15 @@ function goto(page, opts){
   if(page==="cursos") renderCursos();
   if(page==="boleta") renderBoleta(opts.id);
   if(page==="alumno") { currentAlumnoId = opts.id; renderAlumno(opts.id); }
-  if(page==="inscripcion") renderInscripcionForm(opts?.prefillDni);
+  if(page==="alumnonuevo") renderAlumnoNuevoForm();
+  if(page==="matricula") renderMatriculaForm(opts?.prefillDni);
 }
 
 /* Eventos Navegación */
 document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.addEventListener("click", () => goto(btn.dataset.page));
 });
-document.getElementById("btn-ir-inscripcion").addEventListener("click", () => goto("inscripcion"));
+document.getElementById("btn-ir-inscripcion").addEventListener("click", () => goto("matricula"));
 document.getElementById("btn-login").addEventListener("click", () => {
   const u = document.getElementById("login-user").value;
   const p = document.getElementById("login-pass").value;
@@ -614,7 +723,7 @@ function renderCursos(){
   `).join("");
 }
 
-function guardarCurso(e){
+async function guardarCurso(e){
   e.preventDefault();
   const nombre = document.getElementById("c-nombre").value;
   const horas = parseInt(document.getElementById("c-horas").value);
@@ -624,29 +733,86 @@ function guardarCurso(e){
 
   const newId = `CUR-0${DB.cursos.length + 1}`;
   DB.cursos.push({ id: newId, nombre, horas, monto, temas });
+  await guardarDB();
 
   document.getElementById("form-curso").reset();
   renderCursos();
   alert("Curso registrado con éxito en el catálogo.");
 }
 
-/* INSCRIPCIÓN DE ALUMNOS */
-function renderInscripcionForm(prefillDni){
+/* ALUMNOS (datos personales) */
+function renderAlumnoNuevoForm(){
+  ["a-nombre","a-dni","a-cel","a-correo","a-direccion","a-ocupacion"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("a-estado-civil").value = "No especificado";
+  document.getElementById("dni-existente-aviso").style.display = "none";
+}
+
+document.getElementById("a-dni").addEventListener("blur", () => {
+  const dni = document.getElementById("a-dni").value.trim();
+  const aviso = document.getElementById("dni-existente-aviso");
+  aviso.style.display = (dni && getAlumno(dni)) ? "flex" : "none";
+});
+
+function leerFormAlumno(){
+  const nombre = document.getElementById("a-nombre").value.trim();
+  const dni = document.getElementById("a-dni").value.trim();
+  if(!nombre || !dni){ alert("Completa al menos nombre y DNI."); return null; }
+  if(getAlumno(dni)){ alert("Ya existe un alumno con este DNI. Usa 'Matricular curso' para inscribirlo en otro curso."); return null; }
+  return {
+    dni, nombre,
+    celular: document.getElementById("a-cel").value.trim(),
+    correo: document.getElementById("a-correo").value.trim(),
+    direccion: document.getElementById("a-direccion").value.trim(),
+    estadoCivil: document.getElementById("a-estado-civil").value,
+    ocupacion: document.getElementById("a-ocupacion").value.trim(),
+    sede: document.getElementById("a-sede").value
+  };
+}
+
+document.getElementById("btn-guardar-alumno-solo").addEventListener("click", async () => {
+  const alumno = leerFormAlumno();
+  if(!alumno) return;
+  DB.alumnos.push(alumno);
+  await guardarDB();
+  alert("Alumno guardado. Ahora puedes matricularlo desde 'Matricular curso'.");
+  goto("dashboard");
+});
+
+document.getElementById("btn-guardar-alumno").addEventListener("click", async () => {
+  const alumno = leerFormAlumno();
+  if(!alumno) return;
+  DB.alumnos.push(alumno);
+  await guardarDB();
+  goto("matricula", { prefillDni: alumno.dni });
+});
+
+/* MATRÍCULA (alumno existente + curso del catálogo) */
+function renderMatriculaForm(prefillDni){
+  const selectAlumno = document.getElementById("m-alumno");
+  const aviso = document.getElementById("sin-alumnos-aviso");
+  if(!DB.alumnos.length){
+    selectAlumno.innerHTML = "";
+    aviso.style.display = "flex";
+  } else {
+    aviso.style.display = "none";
+    selectAlumno.innerHTML = DB.alumnos.map(a => `<option value="${a.dni}">${a.nombre} — DNI ${a.dni}</option>`).join("");
+    if(prefillDni) selectAlumno.value = prefillDni;
+  }
   const selectCurso = document.getElementById("f-curso");
   selectCurso.innerHTML = DB.cursos.map(c => `<option value="${c.id}">${c.nombre} (S/ ${c.monto})</option>`).join("");
-  
-  if(prefillDni){
-    const prev = DB.inscripciones.find(x => x.dni === prefillDni);
-    if(prev){
-      document.getElementById("f-nombre").value = prev.nombre;
-      document.getElementById("f-dni").value = prev.dni;
-      document.getElementById("f-cel").value = prev.celular;
-      document.getElementById("alumno-existente-aviso").style.display = "flex";
-    }
-  } else {
-    document.getElementById("alumno-existente-aviso").style.display = "none";
-  }
+  onCambioAlumno();
   actualizarPrecioCurso();
+}
+document.getElementById("link-ir-alumno-nuevo").addEventListener("click", () => goto("alumnonuevo"));
+
+function onCambioAlumno(){
+  const dni = document.getElementById("m-alumno").value;
+  const alumno = getAlumno(dni);
+  if(alumno) document.getElementById("m-sede").value = alumno.sede;
+  const otros = alumno ? DB.inscripciones.filter(x=>x.dni===dni) : [];
+  document.getElementById("matricula-titulo").textContent = alumno
+    ? (otros.length ? `Matricular otro curso — ${alumno.nombre} (ya tiene ${otros.length} curso${otros.length>1?'s':''})` : `Matricular curso — ${alumno.nombre}`)
+    : "Matricular curso";
 }
 
 function actualizarPrecioCurso(){
@@ -665,16 +831,15 @@ function previewSaldo(){
   document.getElementById("saldo-preview").textContent = `S/ ${(m - a).toFixed(2)}`;
 }
 
-document.getElementById("btn-inscribir").addEventListener("click", () => {
-  const nombre = document.getElementById("f-nombre").value;
-  const dni = document.getElementById("f-dni").value;
+document.getElementById("btn-inscribir").addEventListener("click", async () => {
+  const dni = document.getElementById("m-alumno").value;
+  const alumno = getAlumno(dni);
+  if(!alumno) return alert("Selecciona un alumno válido (o regístralo primero).");
   const cId = document.getElementById("f-curso").value;
   const cursoObj = DB.cursos.find(c => c.id === cId);
   const monto = parseFloat(document.getElementById("f-monto").value);
   const adelanto = parseFloat(document.getElementById("f-adelanto").value);
   const formaPago = document.getElementById("f-pago").value;
-
-  if(!nombre || !dni) return alert("Por favor complete los campos obligatorios.");
 
   DB.seq++;
   DB.boletaSeq++;
@@ -691,12 +856,9 @@ document.getElementById("btn-inscribir").addEventListener("click", () => {
     tipo: "Inscripción"
   };
 
-  const nuevoAlumno = {
+  const nuevaMatricula = {
     correlativo,
-    nombre,
     dni,
-    celular: document.getElementById("f-cel").value,
-    sede: document.getElementById("f-sede").value,
     curso: cursoObj.nombre,
     modalidad: document.getElementById("f-modalidad").value,
     monto,
@@ -709,7 +871,8 @@ document.getElementById("btn-inscribir").addEventListener("click", () => {
     ultimaBoleta: nuevaBoleta
   };
 
-  DB.inscripciones.push(nuevoAlumno);
+  DB.inscripciones.push(nuevaMatricula);
+  await guardarDB();
   goto("boleta", { id: correlativo });
 });
 
@@ -717,6 +880,7 @@ document.getElementById("btn-inscribir").addEventListener("click", () => {
 function renderDashboard(){
   const tbody = document.getElementById("tbl-inscripciones");
   tbody.innerHTML = DB.inscripciones.map(r => {
+    const alumno = getAlumno(r.dni) || { nombre: "(alumno no encontrado)" };
     const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
     const pend = r.monto - pagado;
     const estPill = pend <= 0 ? `<span class="pill pill-ok">Pagado</span>` : `<span class="pill pill-pend">Debe S/ ${pend.toFixed(2)}</span>`;
@@ -725,7 +889,7 @@ function renderDashboard(){
     return `
       <tr class="link-row" onclick="goto('alumno', {id:'${r.correlativo}'})">
         <td><b style="font-family:'JetBrains Mono';">${r.correlativo}</b></td>
-        <td><b>${r.nombre}</b></td>
+        <td><b>${alumno.nombre}</b></td>
         <td>${r.dni}</td>
         <td style="max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.curso}</td>
         <td>${estPill}</td>
@@ -739,13 +903,14 @@ function renderDashboard(){
 function renderBoleta(id){
   const r = DB.inscripciones.find(x => x.correlativo === id);
   if(!r) return;
+  const alumno = getAlumno(r.dni);
   const b = r.ultimaBoleta || r.pagos[0];
 
   document.getElementById("boleta-output").innerHTML = `
     <div class="ticket">
       <div class="t-center">
         <div class="t-org">CORPORACIÓN DEL PERÚ</div>
-        <div class="t-sub">RUC: 20100227461<br>Sede ${r.sede} · Sistema Académico</div>
+        <div class="t-sub">RUC: 20100227461<br>Sede ${alumno.sede} · Sistema Académico</div>
         <hr>
         <div style="font-weight:700;">BOLETA DE VENTA ELECTRÓNICA</div>
         <div class="t-serie">${b.serie}-${b.numero}</div>
@@ -753,7 +918,7 @@ function renderBoleta(id){
       <hr>
       <div class="t-row"><span>FECHA:</span><span>${b.fecha} ${b.hora}</span></div>
       <div class="t-row"><span>DNI:</span><span>${r.dni}</span></div>
-      <div class="t-row"><span>ALUMNO:</span><span>${r.nombre}</span></div>
+      <div class="t-row"><span>ALUMNO:</span><span>${alumno.nombre}</span></div>
       <div class="t-row"><span>FORMA DE PAGO:</span><span>${b.formaPago}</span></div>
       <hr>
       <div class="t-detail">
@@ -767,13 +932,27 @@ function renderBoleta(id){
   document.getElementById("btn-continuar-alumno").onclick = () => goto("alumno", { id });
 }
 
-/* FICHA DEL ALUMNO */
+/* FICHA DEL ALUMNO (por matrícula) */
 function renderAlumno(id){
   const r = DB.inscripciones.find(x => x.correlativo === id);
   if(!r) return;
+  const alumno = getAlumno(r.dni) || {};
 
-  document.getElementById("alumno-nombre").textContent = r.nombre;
+  document.getElementById("alumno-nombre").textContent = alumno.nombre || "(alumno no encontrado)";
   document.getElementById("alumno-curso").textContent = `${r.curso} (${r.modalidad})`;
+
+  // Render Datos personales
+  document.getElementById("datos-alumno-wrap").innerHTML = `
+    <div class="grid2" style="font-size:13.5px;">
+      <div><b>DNI:</b> ${alumno.dni || "—"}</div>
+      <div><b>Celular:</b> ${alumno.celular || "—"}</div>
+      <div><b>Correo:</b> ${alumno.correo || "—"}</div>
+      <div><b>Estado civil:</b> ${alumno.estadoCivil || "—"}</div>
+      <div><b>Ocupación:</b> ${alumno.ocupacion || "—"}</div>
+      <div><b>Sede:</b> ${alumno.sede || "—"}</div>
+      <div style="grid-column:1/-1;"><b>Dirección:</b> ${alumno.direccion || "—"}</div>
+    </div>
+  `;
 
   // Render Pagos
   const pagado = r.pagos.reduce((a,p)=>a+p.monto,0);
@@ -814,24 +993,30 @@ function renderAlumno(id){
   }
 }
 
-function guardarNota(correlativo, idx, val){
+async function guardarNota(correlativo, idx, val){
   const r = DB.inscripciones.find(x => x.correlativo === correlativo);
   r.temas[idx].nota = val ? parseInt(val) : "";
+  await guardarDB();
 }
 
 async function emitirCertificado(correlativo){
   const r = DB.inscripciones.find(x => x.correlativo === correlativo);
+  const alumno = getAlumno(r.dni);
   const prom = promedio(r.temas);
   if(prom === null) return alert("Por favor ingrese las notas de los módulos antes de emitir.");
 
   const fecha = new Date().toISOString().slice(0,10);
-  const hash = await hmacSHA256Hex(`${r.correlativo}|${r.dni}|${r.nombre}|${prom}|${fecha}`, SECRET_KEY);
+  const hash = await hmacSHA256Hex(`${r.correlativo}|${r.dni}|${alumno.nombre}|${prom}|${fecha}`, SECRET_KEY);
+  // El promedio se guarda internamente (uso interno / futuras validaciones),
+  // pero en el certificado impreso se muestran las horas lectivas, no el promedio.
   r.certificado = { codigoVerif: hash.slice(0,12), promedio: prom, fechaEmision: fecha };
+  await guardarDB();
   
   renderCertificadoVista(r);
 }
 
 function renderCertificadoVista(r){
+  const alumno = getAlumno(r.dni);
   const certDiv = document.getElementById("cert-output");
   certDiv.innerHTML = `
     <div class="cert-wrap">
@@ -841,13 +1026,13 @@ function renderCertificadoVista(r){
         <div class="cert-title">CERTIFICADO DE ESTUDIOS</div>
         <p class="cert-lead">La Dirección Académica certifica que:</p>
       </div>
-      <div class="cert-name">${r.nombre}</div>
+      <div class="cert-name">${alumno.nombre}</div>
       <div class="cert-body">Ha concluido satisfactoriamente los estudios correspondientes al <b>${r.curso.toUpperCase()}</b>.</div>
       <table class="cert-grades">
         <thead><tr><th>MÓDULO</th><th>NOTA</th></tr></thead>
         <tbody>
           ${r.temas.map(t=>`<tr><td>${t.nombre}</td><td>${t.nota || '—'}</td></tr>`).join("")}
-          <tr class="avg"><td>PROMEDIO FINAL</td><td>${r.certificado.promedio}</td></tr>
+          <tr class="avg"><td>HORAS LECTIVAS</td><td>${r.horas}</td></tr>
         </tbody>
       </table>
       <div class="cert-foot">
@@ -863,6 +1048,7 @@ function renderCertificadoVista(r){
         <div class="cert-qr">
           <div id="qrcode"></div>
           <div class="code">${r.certificado.codigoVerif}</div>
+          <div class="code" style="opacity:.7;">${linkVerificacion(r.certificado.codigoVerif)}</div>
         </div>
       </div>
     </div>
@@ -871,28 +1057,30 @@ function renderCertificadoVista(r){
     </div>
   `;
 
+  document.getElementById("qrcode").innerHTML = "";
   new QRCode(document.getElementById("qrcode"), {
-    text: `https://verifica.corporaciondelperu.com/?code=${r.certificado.codigoVerif}`,
+    text: linkVerificacion(r.certificado.codigoVerif),
     width: 64, height: 64
   });
 }
 
 /* VERIFICACIÓN PÚBLICA */
-document.getElementById("btn-verificar").addEventListener("click", () => {
-  const query = document.getElementById("verify-input").value.trim().toUpperCase();
+function verificarCodigo(codigoCrudo){
+  const query = codigoCrudo.trim().toUpperCase();
   const resDiv = document.getElementById("verify-result");
-  
+
   const match = DB.inscripciones.find(x => x.certificado && (x.certificado.codigoVerif.toUpperCase() === query || x.correlativo.toUpperCase() === query));
 
   if(match){
+    const alumno = getAlumno(match.dni);
     resDiv.className = "verify-result show ok";
     resDiv.innerHTML = `
       <div class="verify-head"><div class="verify-icon">✓</div><h4>Certificado Auténtico y Válido</h4></div>
       <div class="verify-detail">
-        <div><dt>Alumno:</dt><dd>${match.nombre}</dd></div>
+        <div><dt>Alumno:</dt><dd>${alumno.nombre}</dd></div>
         <div><dt>DNI:</dt><dd>${match.dni}</dd></div>
         <div><dt>Curso:</dt><dd>${match.curso}</dd></div>
-        <div><dt>Promedio:</dt><dd>${match.certificado.promedio}</dd></div>
+        <div><dt>Horas lectivas:</dt><dd>${match.horas}</dd></div>
         <div><dt>Código Firma:</dt><dd>${match.certificado.codigoVerif}</dd></div>
       </div>
     `;
@@ -903,10 +1091,29 @@ document.getElementById("btn-verificar").addEventListener("click", () => {
       <p style="font-size:13.5px;margin:0;">El código ingresado no coincide con ningún certificado emitido en nuestros registros.</p>
     `;
   }
+}
+document.getElementById("btn-verificar").addEventListener("click", () => {
+  verificarCodigo(document.getElementById("verify-input").value);
+});
+document.getElementById("verify-input").addEventListener("keydown", (e) => {
+  if(e.key === "Enter") verificarCodigo(document.getElementById("verify-input").value);
 });
 
-// Inicialización
-goto("login");
+// Inicialización — carga la BD compartida antes de mostrar cualquier página
+(async () => {
+  await cargarDB();
+
+  // Si la URL trae el código en la ruta (/Certificado/XXXX) o en ?code=XXXX
+  // (compatibilidad), abre directo la verificación pública con ese código.
+  const codigoUrl = getCodigoDesdeURL();
+  if(codigoUrl){
+    goto("verificar");
+    document.getElementById("verify-input").value = codigoUrl;
+    verificarCodigo(codigoUrl);
+  } else {
+    goto("login");
+  }
+})();
 </script>
 </body>
 </html>
